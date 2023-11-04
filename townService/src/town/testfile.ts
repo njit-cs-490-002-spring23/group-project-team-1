@@ -1,4 +1,1 @@
-console.log("File made!");
-
-lol bozos;
-kiawidwid
+console.log('File made!');
