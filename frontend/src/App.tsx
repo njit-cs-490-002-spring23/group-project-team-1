@@ -16,7 +16,7 @@ import VideoOverlay from './components/VideoCall/VideoOverlay/VideoOverlay';
 import TownMap from './components/Town/TownMap';
 import TownControllerContext from './contexts/TownControllerContext';
 import LoginControllerContext from './contexts/LoginControllerContext';
-import { TownsServiceClient } from './generated/client';
+import { TownsServiceClient } from './generated/client/TownsServiceClient';
 
 function App() {
   const [townController, setTownController] = useState<TownController | null>(null);
