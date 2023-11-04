@@ -1,4 +1,3 @@
-console.log("File made!");
-console.log("File updated!");
-//lol bozos;
-//kiawidwid;
+console.log('File made!');
+// lol bozos;
+// kiawidwid;
