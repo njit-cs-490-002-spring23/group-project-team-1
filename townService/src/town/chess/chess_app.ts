@@ -42,7 +42,7 @@ class ChessGame {
   }
 
   // To make a move
-  public make_move(moveToMake: string, color: Colors): void {
+  public make_move(moveToMake: string, color: Colors): string {
     if (
       this._preMoveChecks() &&
       (this._game.moves().includes(moveToMake) || this.matchMoves(moveToMake) !== 'None') &&
@@ -52,6 +52,7 @@ class ChessGame {
     } else {
       console.log('Error');
     }
+    return this.getFen();
   }
 
   public getFen(): string {
@@ -62,6 +63,7 @@ class ChessGame {
     return this._game.moves();
   }
 
+  // I might now need to make this. I might just auto assume that the front end will pass the right notation, because this is bugging out.
   public matchMoves(moveToMake: string): string {
     const moves = this.getMoves();
     for (let i = 0; i < moves.length; i++) {
