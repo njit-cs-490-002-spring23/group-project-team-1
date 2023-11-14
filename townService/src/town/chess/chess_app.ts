@@ -88,6 +88,7 @@ class ChessGame {
     return this._game.turn();
   }
 
+  // Call this to check if the game is over or not after every move.
   public getReasonForGameEnd(): string {
     if (!this._game.isGameOver()) return 'Not Over';
     if (this._game.isCheckmate())
