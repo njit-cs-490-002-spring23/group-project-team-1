@@ -18,15 +18,19 @@ class ChessGame {
   gameID: number;
 
   private _game: Chess;
-
+  // winner: number; winner's id number
   // white_id: number; white player id
   // black_id: number; black player id
+
   timer: number;
+
+  private _history: { [move: string]: string };
 
   constructor(time_limit: number) {
     this.gameID = Math.floor(Math.random() * 100000);
     this.timer = time_limit;
     this._game = new Chess();
+    this._history = {};
   }
 
   private _preMoveChecks(): boolean {
@@ -49,6 +53,7 @@ class ChessGame {
       color === this._game.turn()
     ) {
       this._game.move(moveToMake);
+      this._history[moveToMake] = this.getFen();
     } else {
       console.log('Error');
     }
@@ -69,6 +74,9 @@ class ChessGame {
     for (let i = 0; i < moves.length; i++) {
       const move = moves[i];
       console.log(move);
+      if (moveToMake[-1] === '#' && moves.includes(moveToMake)) {
+        return move;
+      }
       if (move.match(`^${moveToMake}.?`)) {
         return move;
       }
@@ -79,19 +87,49 @@ class ChessGame {
   public getTurn(): string {
     return this._game.turn();
   }
+
+  public getReasonForGameEnd(): string {
+    if (!this._game.isGameOver()) return 'Not Over';
+    if (this._game.isCheckmate())
+      return `Checkmate - ${this.getTurn() === Colors.White ? Colors.Black : Colors.White}`;
+    if (this._game.isInsufficientMaterial()) return 'Insufficient Material';
+    if (this._game.isThreefoldRepetition()) return 'Three Fold Repetition';
+    if (this._game.isDraw()) return 'Draw';
+    return 'Not Over';
+  }
+
+  public loadFen(fen: string): boolean {
+    this._game.load(fen);
+    if (this.getFen() === fen) return true;
+    return false;
+  }
+
+  public getHistory() {
+    return this._history;
+  }
 }
 
-const gamer = new ChessGame(10);
+/* Test Area */
+const gamer = new ChessGame(10); // initialize
 console.log(gamer.gameID);
 console.log(gamer.getFen());
 console.log(gamer.getMoves());
-const MOVE = 'e3#';
+const MOVE = 'e3';
 console.log(gamer.matchMoves(MOVE));
 // if ('e3+'.match(`^${MOVE}`)) {
 //   console.log('true');
 // }
-gamer.make_move('Na3', Colors.White);
+console.log(gamer.getHistory());
+gamer.make_move('Na3', Colors.White); // make move
 console.log(gamer.getFen());
 console.log(gamer.getTurn() === Colors.Black);
+console.log(gamer.getHistory());
+gamer.make_move('e5', Colors.Black); // make another move
+console.log(gamer.getHistory());
+const hist = gamer.getHistory();
+// console.log(hist['Na3']);
+console.log(gamer.getFen());
+// gamer.loadFen(gamer.getHistory()['Na3']); // revert to old board state from history
+console.log(gamer.getFen());
 
 export default ChessGame;
