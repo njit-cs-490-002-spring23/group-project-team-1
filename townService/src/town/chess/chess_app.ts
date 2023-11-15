@@ -18,19 +18,25 @@ class ChessGame {
   gameID: number;
 
   private _game: Chess;
-  // winner: number; winner's id number
-  // white_id: number; white player id
-  // black_id: number; black player id
+
+  winner: number;
+
+  white_id: number;
+
+  black_id: number;
 
   timer: number;
 
   private _history: { [move: string]: string };
 
-  constructor(time_limit: number) {
+  constructor(whiteID: number, blackID: number, time_limit = 999999) {
     this.gameID = Math.floor(Math.random() * 100000);
-    this.timer = time_limit;
     this._game = new Chess();
     this._history = {};
+    this.winner = -1;
+    this.white_id = whiteID;
+    this.black_id = blackID;
+    this.timer = time_limit;
   }
 
   private _preMoveChecks(): boolean {
@@ -73,7 +79,7 @@ class ChessGame {
     const moves = this.getMoves();
     for (let i = 0; i < moves.length; i++) {
       const move = moves[i];
-      console.log(move);
+      // console.log(move);
       if (moveToMake[-1] === '#' && moves.includes(moveToMake)) {
         return move;
       }
@@ -108,29 +114,48 @@ class ChessGame {
   public getHistory() {
     return this._history;
   }
+
+  public checkIfCheckmate(): boolean {
+    if (this._game.isCheckmate()) {
+      this.winner = this.getTurn() === Colors.Black ? this.white_id : this.black_id;
+      return true;
+    }
+    return false;
+  }
 }
 
 /* Test Area */
-const gamer = new ChessGame(10); // initialize
+const gamer = new ChessGame(1, 2, 10); // initialize
 console.log(gamer.gameID);
 console.log(gamer.getFen());
 console.log(gamer.getMoves());
-const MOVE = 'e3';
-console.log(gamer.matchMoves(MOVE));
+const MOVE = 'e4';
+console.log('MATCH: ', gamer.matchMoves(MOVE));
 // if ('e3+'.match(`^${MOVE}`)) {
 //   console.log('true');
 // }
 console.log(gamer.getHistory());
-gamer.make_move('Na3', Colors.White); // make move
+gamer.make_move('e4', Colors.White); // make move
 console.log(gamer.getFen());
 console.log(gamer.getTurn() === Colors.Black);
 console.log(gamer.getHistory());
-gamer.make_move('e5', Colors.Black); // make another move
+gamer.make_move('f5', Colors.Black); // make another move
 console.log(gamer.getHistory());
 const hist = gamer.getHistory();
 // console.log(hist['Na3']);
 console.log(gamer.getFen());
 // gamer.loadFen(gamer.getHistory()['Na3']); // revert to old board state from history
 console.log(gamer.getFen());
+console.log(gamer.timer);
+gamer.make_move('Bc4', Colors.White);
+gamer.make_move('g5', Colors.Black);
+console.log(gamer.winner);
+console.log('-------------------');
+console.log(gamer.getFen());
+console.log(gamer.checkIfCheckmate());
+gamer.make_move('Qh5', Colors.White);
+console.log(gamer.getFen());
+console.log(gamer.checkIfCheckmate());
+console.log(gamer.winner);
 
 export default ChessGame;
