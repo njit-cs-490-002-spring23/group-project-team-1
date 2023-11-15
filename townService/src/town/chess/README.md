@@ -7,7 +7,7 @@ Andrew Dickman -- Chess Logic / Functionality Documentation
 
 A third parameter, time_limit, is optional, and defaults to 999999 if not entered.
 
-# BASIC OUTLINE FOR THE CHESS FUNCTIONS:
+# Outline of Chess functions
 
 ## .make_move(moveToMake: string, color: Colors) --> string:
 This function takes in the move you're making, as well as the color of the player making the move.
@@ -53,16 +53,20 @@ If there is a checkmate, this function will initialize the attribute .winner as 
 
 ## .env File
 To begin, create a .env file located in the same directory as the stockfish.ts
-In this .env file, put ```PATH_TO_STOCKFISH="path/to/stockfish/.exe"```
+In this .env file, put 
+```PATH_TO_STOCKFISH="path/to/stockfish/.exe"```
+
 Note the path must have FORWARD SLASHES.
 If you do not have Stockfish installed locally, you must download it and find a path to the .exe file within it for this to work.
 
 ## Initalize Stockfish in the Code
 ```import CallStockfish from 'stockfish.ts'```
+
 ```const stockfish = new CallStockfish(ELO_RATING)```
+
 MIN ELO = 300, MAX ELO = 3000.
 
-# OUTLINE OF STOCKFISH FUNCTIONS
+# Outline of Stockfish functions
 
 .callStockfish and .getBestMovesList are async functions, you must use the await keyword with them in order to accurately get the results.
 
@@ -83,4 +87,5 @@ This function has no return value, instead you have to call:
 This function will return the generate list of moves from the previous .getBestMovesList() call.
 
 # stockfishAPI.py
-## Do not touch.
+## Ignore this file.
+Do not touch it.
