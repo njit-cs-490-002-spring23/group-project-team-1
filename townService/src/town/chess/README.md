@@ -43,7 +43,7 @@ Returns the current boards FEN string.
 Returns an array of strings of all of the current possible moves for the players who's turn it is.
 
 
-## .getPieceOnSquare(square: string) --> {Type: string, Color: string}:
+## .getPieceOnSquare(square: string) --> { Type: string, Color: string }:
 Takes the square as a string (must be a valid board square, meaning one between a1-h8), and returns a string dictionary containing the Type (Piece Type), and the Color('w' or 'b').
 
 
@@ -69,7 +69,7 @@ Function to load the board to any state based on the passed FEN String parameter
 Returns true if successful, and false otherwise.
 
 
-## .getHistory() --> {move (string): FEN String (string)}
+## .getHistory() --> { move (string): FEN String (string) }
 Returns the current history of the game, starting from move one, with each move and the corresponding board state to it.
 
 
@@ -78,11 +78,15 @@ Returns true if there is a checkmate, and false otherwise.
 If there is a checkmate, this function will initialize the attribute .winner as the winner's playerID.
 
 
+
+
+
 # Stockfish Initalization
 
 ## .env File
-To begin, create a .env file located in the same directory as the stockfish.ts
+To begin, create a .env file located in the same directory as the stockfish.ts.
 In this .env file, put 
+
 ```PATH_TO_STOCKFISH="path/to/stockfish/.exe"```
 
 Note the path must have FORWARD SLASHES.
