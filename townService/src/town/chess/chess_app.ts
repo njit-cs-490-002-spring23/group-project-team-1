@@ -4,16 +4,19 @@
  * Make timer count down
  */
 
-import { Chess } from 'chess.js';
+import { Chess, SQUARES, Square } from 'chess.js';
 
-// const chess = new Chess();
-// Class for Chess Game
-
+/**
+ * Colors for referencing pieces or player. Use this, it is directly related to the backend functionality.
+ */
 export enum Colors {
   White = 'w',
   Black = 'b',
 }
 
+/**
+ * Chess Class. Offers basic logic for a chess game, as well as many functions to use this logic.
+ */
 class ChessGame {
   gameID: number;
 
@@ -29,6 +32,13 @@ class ChessGame {
 
   private _history: { [move: string]: string };
 
+  /**
+   * Initialize your chess game object. This will be used to interact with the board. To display the board, do so by FEN string and the getFen() function.
+   * Also initializes the gameID of the game for history purposes, if needed.
+   * @param whiteID Player ID of white.
+   * @param blackID Player ID of black.
+   * @param time_limit Optional: Timer value. If not set, defaults to infinity (999999).
+   */
   constructor(whiteID: number, blackID: number, time_limit = 999999) {
     this.gameID = Math.floor(Math.random() * 100000);
     this._game = new Chess();
@@ -39,6 +49,10 @@ class ChessGame {
     this.timer = time_limit;
   }
 
+  /**
+   * Function to check if the game is over.
+   * @returns False is the game is over, true otherwise.
+   */
   private _preMoveChecks(): boolean {
     if (
       this._game.isCheckmate() ||
@@ -46,12 +60,21 @@ class ChessGame {
       this._game.isDraw() ||
       this._game.isInsufficientMaterial() ||
       this._game.isThreefoldRepetition()
-    )
+    ) {
+      this.checkIfCheckmate();
       return false;
+    }
     return true;
   }
 
-  // To make a move
+  /**
+   * Make a move on the chess board.
+   * @param moveToMake The move you intend to make, this should follow standard Chess Algebraic Move Notation.
+   * For example: e4 means the pawn on e2/e3 will move to e4. The symbol structure for this is:
+   * [Piece][moveToMake][ + (if move puts king in check) / # (if move results in checkmate)]
+   * @param color Color of the piece of being moved.
+   * @returns The new FEN string of the board so the visual could be updated.
+   */
   public make_move(moveToMake: string, color: Colors): string {
     if (
       this._preMoveChecks() &&
@@ -66,15 +89,37 @@ class ChessGame {
     return this.getFen();
   }
 
+  /**
+   * Function to get the FEN string of the current board.
+   * @returns FEN string of current board state.
+   */
   public getFen(): string {
     return this._game.fen();
   }
 
+  /**
+   * Function to get a list of all the possible moves on the board currently.
+   * @returns String array of all possible moves.
+   */
   public getMoves(): string[] {
     return this._game.moves();
   }
 
-  // I might now need to make this. I might just auto assume that the front end will pass the right notation, because this is bugging out.
+  /**
+   * Function get the current piece on a square and it's color.
+   * @param square string of the board square that you're trying to get. Must be a valid chess square (a1-h8) in that syntax.
+   * @returns Dictionary of the piece and the color of the piece. Returns null if the input isn't valid.
+   */
+  public getPieceOnSquare(square: string) {
+    if (SQUARES.includes(square as Square)) return this._game.get(square as Square);
+    return null;
+  }
+
+  /**
+   * Work in Progress. Matches move to a move in the list of valid moves. Use this to confirm your notation before calling make_move.
+   * @param moveToMake Move you are attempting to make. Follow Chess standard move notation.
+   * @returns The closest move to the move passed with Valid syntax, otherwise 'None'.
+   */
   public matchMoves(moveToMake: string): string {
     const moves = this.getMoves();
     for (let i = 0; i < moves.length; i++) {
@@ -90,11 +135,19 @@ class ChessGame {
     return 'None';
   }
 
+  /**
+   * Function to get what color's turn it is.
+   * @returns String of which color's turn it is. Directly equal to the enum Colors. Use this enum in your code.
+   */
   public getTurn(): string {
     return this._game.turn();
   }
 
-  // Call this to check if the game is over or not after every move.
+  /**
+   * Function to give direct reason for game ending. Can be called after every move to check if game is still ongoing.
+   * @returns 'Not Over' if game is still in progress, 'Checkmate - ['w'/'b']' if theres a checkmate,
+   * 'Insufficient Material' if there's insufficient material, 'Three Fold Repetition' for TFR, 'Draw' for draw state.
+   */
   public getReasonForGameEnd(): string {
     if (!this._game.isGameOver()) return 'Not Over';
     if (this._game.isCheckmate())
@@ -105,18 +158,30 @@ class ChessGame {
     return 'Not Over';
   }
 
+  /**
+   * Function to load board to a specific state by FEN string. Good for use for accessing history of game.
+   * @param fen FEN string to load the board state to.
+   * @returns True if the board was successfully loaded, false otherwise.
+   */
   public loadFen(fen: string): boolean {
     this._game.load(fen);
     if (this.getFen() === fen) return true;
     return false;
   }
 
+  /**
+   * Function to get history of the game.
+   * @returns Dictionary of move names and their corresponding FEN position.
+   */
   public getHistory() {
     return this._history;
   }
 
+  /**
+   * Function to check if there's been a checkmate.
+   * @returns True of there was a checkmate, as well as sets the winner attribute, false otherwise.
+   */
   public checkIfCheckmate(): boolean {
-    console.log(this._game.ascii());
     if (this._game.isCheckmate()) {
       this.winner = this.getTurn() === Colors.Black ? this.white_id : this.black_id;
       return true;
@@ -161,5 +226,7 @@ gamer.make_move('Qh5', Colors.White);
 console.log(gamer.getFen());
 console.log(gamer.checkIfCheckmate());
 console.log(gamer.winner);
+console.log(gamer.getPieceOnSquare('a2'));
+console.log(gamer.getPieceOnSquare('a1')?.type);
 
 export default ChessGame;
