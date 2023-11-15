@@ -1,25 +1,33 @@
+import fetch from 'node-fetch';
+
 class CallStockfish {
-  _ELO: number;
+  private _elo: number;
+
+  private _move: string;
+
+  private _moveList: string[];
 
   constructor(ELO_VALUE: number) {
-    this._ELO = ELO_VALUE;
+    this._elo = ELO_VALUE;
+    this.setElo();
+    this._move = '';
+    this._moveList = [];
   }
 
-  public gameStart() {
+  public setElo() {
     fetch('http://127.0.0.1:5000/receiver', {
       method: 'POST',
       headers: {
         'Content-type': 'application/json',
         'Accept': 'application/json',
       },
-      // Strigify the payload into JSON</strong>:
-      body: JSON.stringify(this._ELO),
+      body: JSON.stringify(this._elo),
     })
       .then(res => {
         if (res.ok) {
           return res.json();
         }
-        alert('something is wrong');
+        console.log('something is wrong');
         return {
           status: 400,
         };
@@ -31,111 +39,72 @@ class CallStockfish {
       .catch(err => console.error(err));
   }
 
-  /*
-    public callStockfish (fenString) {
-        if(game.in_checkmate()) {
-            checkmateFunction();
-            return;
+  public async callStockfish(fen: string) {
+    await fetch('http://127.0.0.1:5000/receiver', {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify(fen),
+    })
+      .then(res => {
+        if (res.ok) {
+          return res.json();
         }
-        fetch("http://127.0.0.1:5000/receiver", 
-            {
-                method: 'POST',
-                headers: {
-                    'Content-type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                // Strigify the payload into JSON</strong>:
-                body:JSON.stringify(fenString)
-            })
-            .then(res=>{
-                if(res.ok){
-                    return res.json()
-                }else{
-                    alert("something is wrong")
-                }
-            })
-            .then(jsonResponse=>{
-                // Log the response data in the console
-                console.log(jsonResponse)
-                moveToMake = jsonResponse
-                console.log("move to make", moveToMake);
-                console.log(moveToMake.slice(2,4));
-                console.log(game.moves());
-                console.log(game.get(moveToMake.slice(0,2)).type.toUpperCase());
-                if(game.move(moveToMake.slice(2,4)) === null) {
-                    const piece = game.get(moveToMake.slice(0,2)).type.toUpperCase();
-                    const correct_move_notation = piece + moveToMake.slice(2,4);
-                    console.log(correct_move_notation);
-                    if(game.move(correct_move_notation) === null) {
-                        if (piece === 'P') {
-                            const capture_pawn_notation = moveToMake.slice(0,1) + 'x' + moveToMake.slice(2,4);
-                            if(game.move(capture_pawn_notation) === null) {
-                                if(game.move(capture_pawn_notation + '+') === null) {
-                                    if(game.move(capture_pawn_notation + '=Q') === null) {
-                                        if(game.move(capture_pawn_notation + '=Q+') === null) {
-                                            if(game.move(capture_pawn_notation + '=Q#') === null) {
-                                                if(game.move(moveToMake.slice(2,4) + '=Q') === null) {
-                                                    if(game.move(moveToMake.slice(2,4) + '=Q+') === null) {
-                                                        game.move(moveToMake.slice(2,4) + '+');
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            board.position(game.fen());
-                            return;
-                        }
-                        const capture_notation = piece + 'x' + moveToMake.slice(2,4);
-                        console.log(capture_notation);
-                        if(game.move(capture_notation) === null) {
-                            console.log(capture_notation + '+');
-                            if(game.move(capture_notation + '+') === null) {
-                                if(game.move(correct_move_notation + '+') === null) {
-                                    if(piece === 'N') {
-                                        console.log(piece + moveToMake.slice(0,1) + moveToMake.slice(2,4));
-                                        if(game.move(piece + moveToMake.slice(0,1) + moveToMake.slice(2,4)) === null) {
-                                            console.log(piece + moveToMake.slice(0,1) + moveToMake.slice(2,4) + '+');
-                                            if(game.move(piece + moveToMake.slice(0,1) + moveToMake.slice(2,4) + '+') === null) {
-                                                console.log(piece + moveToMake.slice(1,2) + moveToMake.slice(2,4));
-                                                if(game.move(piece + moveToMake.slice(1,2) + moveToMake.slice(2,4)) === null) {
-                                                    console.log(piece + moveToMake.slice(1,2) + moveToMake.slice(2,4) + '+');
-                                                    if(game.move(piece + moveToMake.slice(1,2) + moveToMake.slice(2,4) + '+') === null) {
-                                                        if(game.move(piece + moveToMake.slice(1,2) + moveToMake.slice(2,4) + '#') === null) {
-                                                            if(game.move(piece + moveToMake.slice(0,1) + moveToMake.slice(2,4) + '#') === null) {
-                                                                game.move(piece + moveToMake.slice(2,4) + '#')
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    } else {
-                                        console.log(capture_notation + '#');
-                                        if(game.move(capture_notation + '#') === null) {
-                                            console.log(correct_move_notation + '#');
-                                            if(game.move(correct_move_notation + '#') === null) {
-                                                if(piece === 'K' && moveToMake === 'e8g8'){
-                                                    console.log("NOT QUEEN SIDE CASTLE");
-                                                    game.move("O-O");
-                                                } else if (piece === 'K' && moveToMake == 'e8c8') {
-                                                    console.log("QUEEN SIDE CASTLE");
-                                                    game.move("O-O-O");
-                                                }
-                                            }
-                                        }
-                                    }
-                                    
-                                }
-                            }
-                        }
-                    } 
-                }
-                board.position(game.fen());
-            })
-            .catch((err) => console.error(err));
-    } */
+        console.log('something is wrong');
+        return null;
+      })
+      .then(jsonResponse => {
+        const stockfishMove: string = jsonResponse as string;
+        this._move = stockfishMove;
+      })
+      .catch(err => {
+        throw err;
+      });
+  }
+
+  public async getBestMovesList(fen: string) {
+    await fetch('http://127.0.0.1:5000/movelist', {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify(fen),
+    })
+      .then(res => {
+        if (res.ok) {
+          return res.json();
+        }
+        console.log('something is wrong');
+        return null;
+      })
+      .then(jsonResponse => {
+        const stockfishList: string[] = jsonResponse as [];
+        this._moveList = stockfishList;
+      })
+      .catch(err => {
+        throw err;
+      });
+  }
+
+  public getMove() {
+    return this._move;
+  }
+
+  public getMoveList() {
+    return this._moveList;
+  }
 }
+
+const stockypoo = new CallStockfish(3000);
+await stockypoo.callStockfish('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
+
+console.log(stockypoo.getMove());
+
+await stockypoo.getBestMovesList('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
+
+console.log(stockypoo.getMoveList());
 
 export default CallStockfish;
