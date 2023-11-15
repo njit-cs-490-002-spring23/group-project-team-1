@@ -116,6 +116,7 @@ class ChessGame {
   }
 
   public checkIfCheckmate(): boolean {
+    console.log(this._game.ascii());
     if (this._game.isCheckmate()) {
       this.winner = this.getTurn() === Colors.Black ? this.white_id : this.black_id;
       return true;
@@ -153,6 +154,9 @@ console.log(gamer.winner);
 console.log('-------------------');
 console.log(gamer.getFen());
 console.log(gamer.checkIfCheckmate());
+console.log(gamer.getMoves());
+gamer.make_move('exf5', Colors.White);
+gamer.make_move('a5', Colors.Black);
 gamer.make_move('Qh5', Colors.White);
 console.log(gamer.getFen());
 console.log(gamer.checkIfCheckmate());
