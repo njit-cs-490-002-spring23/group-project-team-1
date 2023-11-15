@@ -24,7 +24,7 @@ def get_top_move(fenPos):
      print("IN FUNCTION:", fenPos)
      if stockfish.is_fen_valid(fen=fenPos):
           stockfish.set_fen_position(fenPos)
-          move = stockfish.get_best_move()
+          move = stockfish.get_best_move(5000)
           return move
      return "Invalid Move"
 
@@ -38,7 +38,7 @@ def get_best_moves(fenPos):
 @app.route("/receiver", methods=["POST"])
 def postME():
    print(request.get_json())
-   if request.get_json().isdigit():
+   if type(request.get_json()) == int or request.get_json().isdigit():
        stockfish.set_elo_rating(int(request.get_json()))
        print("ELO SET")
        return {
@@ -51,6 +51,14 @@ def postME():
    print(bestMove)
    bestMove = jsonify(bestMove)
    return bestMove
+
+@app.route("/movelist", methods=["POST"])
+def moveList():
+    print(request.get_json())
+    fen = request.get_json()
+    move_list = get_best_moves(fen)
+    move_list = jsonify(move_list)
+    return move_list
 
 if __name__ == "__main__": 
    app.run(debug=True)
