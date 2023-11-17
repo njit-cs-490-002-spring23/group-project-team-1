@@ -40,6 +40,8 @@
     "dependencies": {
         "@chakra-ui/react": "^2.8.2",
         "@types/ramda": "^0.27.34",
+        "chess.js": "^1.0.0-beta.6",
+        "node-fetch": "^3.3.2",
         "ramda": "^0.27.1",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
