@@ -188,6 +188,14 @@ class ChessGame {
     }
     return false;
   }
+
+  /** !
+   * Function to assign winner if a player concedes. Attribute .winner will be assigned to winner. No return value.
+   * @param color Color of the conceding player.
+   */
+  public concede(color: Colors): void {
+    this.winner = color === Colors.Black ? this.white_id : this.black_id;
+  }
 }
 
 /* Test Area */
