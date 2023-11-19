@@ -52,5 +52,71 @@ describe('Chess Game', () => {
       game.make_move(move, Colors.White);
       expect(game.getReasonForGameEnd()).toEqual('Not Over');
     });
+    it('Puts the piece onto the move square', () => {
+      expect(game.getPieceOnSquare('e2')).toEqual({ type: 'p', color: 'w' });
+      game.make_move(move, Colors.White);
+      expect(game.getPieceOnSquare('e2')).toEqual(false);
+      expect(game.getPieceOnSquare('e4')).toEqual({ type: 'p', color: 'w' });
+    });
+    it('Doesnt cause a checkmate', () => {
+      game.make_move(move, Colors.White);
+      expect(game.checkIfCheckmate()).toEqual(false);
+    });
+  });
+
+  describe('Load back to old history state', () => {
+    it('Loads the board', () => {
+      const prevFen = game.make_move('e4', Colors.White);
+      game.make_move('e5', Colors.Black);
+      expect(game.getFen()).toEqual('rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2');
+      game.loadFen(prevFen);
+      expect(game.getFen()).toEqual(prevFen);
+    });
+    it('Actually sets the pieces', () => {
+      const prevFen = game.make_move('e4', Colors.White);
+      game.make_move('e5', Colors.Black);
+      expect(game.getPieceOnSquare('e4')).toEqual({ type: 'p', color: 'w' });
+      expect(game.getPieceOnSquare('e5')).toEqual({ type: 'p', color: 'b' });
+      expect(game.getFen()).toEqual('rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2');
+      game.loadFen(prevFen);
+      expect(game.getFen()).toEqual(prevFen);
+      expect(game.getPieceOnSquare('e4')).toEqual({ type: 'p', color: 'w' });
+      expect(game.getPieceOnSquare('e7')).toEqual({ type: 'p', color: 'b' });
+      expect(game.getPieceOnSquare('e5')).toEqual(false);
+      expect(game.getPieceOnSquare('e2')).toEqual(false);
+    });
+  });
+
+  describe('Concede', () => {
+    it('Sets the winner', () => {
+      expect(game.winner).toEqual(-1);
+      game.concede(Colors.White);
+      expect(game.winner).toEqual(game.black_id);
+    });
+    it('Ends the game', () => {
+      expect(game.winner).toEqual(-1);
+      game.concede(Colors.White);
+      expect(game.winner).toEqual(game.black_id);
+      expect(game.make_move('e4', Colors.White)).toEqual('Error');
+      expect(game.getReasonForGameEnd()).toEqual('Concede');
+    });
+  });
+
+  describe('Match Moves', () => {
+    it('Matches a basic move', () => {
+      expect(game.matchMoves('e4')).toEqual('e4');
+      expect(game.matchMoves('Nc3')).toEqual('Nc3');
+    });
+    it('Matches a Check move', () => {
+      game.loadFen('rnbqkbnr/ppppp1pp/8/5p2/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2');
+      expect(game.matchMoves('Qh5')).toEqual('Qh5+');
+    });
+    it('Matches Checkmate Move', () => {
+      game.loadFen('rnbqkbnr/ppppp2p/8/5Pp1/8/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2');
+      expect(game.matchMoves('Qh5')).toEqual('Qh5#');
+      game.make_move(game.matchMoves('Qh5'), Colors.White);
+      expect(game.checkIfCheckmate()).toEqual(true);
+      expect(game.winner).toEqual(game.white_id);
+    });
   });
 });
