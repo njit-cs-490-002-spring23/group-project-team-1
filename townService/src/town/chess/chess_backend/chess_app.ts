@@ -64,6 +64,9 @@ class ChessGame {
       this.checkIfCheckmate();
       return false;
     }
+    if (this.winner !== -1) {
+      return false;
+    }
     return true;
   }
 
@@ -85,6 +88,7 @@ class ChessGame {
       this._history[moveToMake] = this.getFen();
     } else {
       console.log('Error');
+      return 'Error';
     }
     return this.getFen();
   }
@@ -149,6 +153,8 @@ class ChessGame {
    * 'Insufficient Material' if there's insufficient material, 'Three Fold Repetition' for TFR, 'Draw' for draw state.
    */
   public getReasonForGameEnd(): string {
+    console.log('WINNER', this.winner);
+    if (this.winner !== -1) return 'Concede';
     if (!this._game.isGameOver()) return 'Not Over';
     if (this._game.isCheckmate())
       return `Checkmate - ${this.getTurn() === Colors.White ? Colors.Black : Colors.White}`;
@@ -187,6 +193,14 @@ class ChessGame {
       return true;
     }
     return false;
+  }
+
+  /** !
+   * Function to assign winner if a player concedes. Attribute .winner will be assigned to winner. No return value.
+   * @param color Color of the conceding player.
+   */
+  public concede(color: Colors): void {
+    this.winner = color === Colors.Black ? this.white_id : this.black_id;
   }
 }
 
