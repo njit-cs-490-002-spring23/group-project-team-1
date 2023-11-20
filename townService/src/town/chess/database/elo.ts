@@ -37,6 +37,9 @@ class MatchResult {
   }
 }
 
-const result = new MatchResult('Deep Blue', 'Deep Blue', 0);
-const ELO = Database.db_getELO('Deep Blue');
-console.log(ELO);
+//const result = new MatchResult('Deep Blue', 'Deep Blue', 0);
+const ELO = await Database.db_getELO('Deep Blue');
+
+console.log("Here is your elo: " + ELO);
+
+
