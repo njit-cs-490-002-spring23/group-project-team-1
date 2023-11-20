@@ -1,6 +1,6 @@
 import { Database } from "./database";
 
-class Elo {
+class MatchResult {
   // kmw: Currently decided to make it compare Player1 vs Player2 in that order
   // ex: Player1 vs Player2, if player
   // (win = 1, draw = 0.5, loss = 0)
@@ -39,6 +39,8 @@ class Elo {
   }
 }
 
-let elo = new Elo("Deep Blue", "Deep Blue", 0);
-elo.database.db_getELO("Deep Blue");
+let result = new MatchResult("Deep Blue", "Deep Blue", 0);
+let elo = result.database.db_getELO("Deep Blue");
+console.log(elo);
+
 
