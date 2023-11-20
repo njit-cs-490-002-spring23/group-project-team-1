@@ -1,4 +1,4 @@
-import { Database } from "./database";
+import Database from './database';
 
 class MatchResult {
   // kmw: Currently decided to make it compare Player1 vs Player2 in that order
@@ -9,8 +9,6 @@ class MatchResult {
   player2_user: string;
 
   game_score: number;
-
-  database = new Database;
 
   // kmw: Making the assumption that we have already assigned the associated elo ratings and passed the result of the game
   constructor(userPlayer1: string, userPlayer2: string, score: number) {
@@ -39,8 +37,6 @@ class MatchResult {
   }
 }
 
-let result = new MatchResult("Deep Blue", "Deep Blue", 0);
-let elo = result.database.db_getELO("Deep Blue");
-console.log(elo);
-
-
+const result = new MatchResult('Deep Blue', 'Deep Blue', 0);
+const ELO = Database.db_getELO('Deep Blue');
+console.log(ELO);
