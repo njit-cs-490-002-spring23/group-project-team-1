@@ -1,3 +1,5 @@
+import { Database } from "./database";
+
 class Elo {
   // kmw: Currently decided to make it compare Player1 vs Player2 in that order
   // ex: Player1 vs Player2, if player
@@ -7,6 +9,8 @@ class Elo {
   player2_user: string;
 
   game_score: number;
+
+  database = new Database;
 
   // kmw: Making the assumption that we have already assigned the associated elo ratings and passed the result of the game
   constructor(userPlayer1: string, userPlayer2: string, score: number) {
@@ -34,3 +38,7 @@ class Elo {
     const newEloPlayer2 = oldEloPlayer2 - ratingChange;
   }
 }
+
+let elo = new Elo("Deep Blue", "Deep Blue", 0);
+elo.database.db_getELO("Deep Blue");
+
