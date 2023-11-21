@@ -118,5 +118,24 @@ describe('Chess Game', () => {
       expect(game.checkIfCheckmate()).toEqual(true);
       expect(game.winner).toEqual(game.white_id);
     });
+    it('Matches King Side Castling', () => {
+      game.loadFen('rn2kbnr/pppbpppp/8/q2p4/4P3/5N2/PPPPBPPP/RNBQK2R w KQkq - 1 2');
+      expect(game.matchMoves('O-O')).toEqual('O-O');
+      game.make_move('O-O', Colors.White);
+      expect(game.getPieceOnSquare('g1')?.type).toEqual('k');
+    });
+    it('Matches Queen Side Castling', () => {
+      game.loadFen('r3kbnr/pppbpppp/n7/q2p4/4P3/3P1N2/PPP1BPPP/RNBQ1RK1 b KQkq - 1 2');
+      console.log(game.getMoves());
+      console.log(game.matchMoves('Qa2'));
+      expect(game.matchMoves('O-O-O')).toEqual('O-O-O');
+      game.make_move('O-O-O', Colors.Black);
+      expect(game.getPieceOnSquare('c8')?.type).toEqual('k');
+    });
+    it('Matches Pawn Moves with capture', () => {
+      game.loadFen('r3kbnr/pppbpppp/n7/q2p4/4P3/3P1N2/PPP1BPPP/RNBQ1RK1 b KQkq - 1 2');
+      console.log(game.getMoves());
+      // do the dxe4 move.
+    });
   });
 });
