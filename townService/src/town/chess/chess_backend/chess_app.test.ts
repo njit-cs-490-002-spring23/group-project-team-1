@@ -134,8 +134,9 @@ describe('Chess Game', () => {
     });
     it('Matches Pawn Moves with capture', () => {
       game.loadFen('r3kbnr/pppbpppp/n7/q2p4/4P3/3P1N2/PPP1BPPP/RNBQ1RK1 b KQkq - 1 2');
-      console.log(game.getMoves());
-      // do the dxe4 move.
+      expect(game.matchMoves('d5e4')).toEqual('dxe4');
+      game.make_move(game.matchMoves('d5e4'), Colors.Black);
+      expect(game.getPieceOnSquare('e4')?.color).toEqual('b');
     });
   });
 });

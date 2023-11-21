@@ -142,6 +142,12 @@ class ChessGame {
       if (moveToMake.slice(3, 4) === '#' || moveToMake.slice(3, 4) === '+') {
         piece = moveToMake.slice(0, 1);
         moveSpace = moveToMake.slice(1, 3);
+      } else if (
+        this.getPieceOnSquare(moveToMake.slice(0, 2))?.type === 'p' &&
+        this.getPieceOnSquare(moveToMake.slice(2, 4))?.type === 'p'
+      ) {
+        piece = moveToMake.slice(0, 1);
+        moveSpace = moveToMake.slice(2, 4);
       } else {
         piece = this.getPieceOnSquare(moveToMake.slice(0, 2))?.type.toUpperCase(); // ??
         moveSpace = moveToMake.slice(2, 4);
