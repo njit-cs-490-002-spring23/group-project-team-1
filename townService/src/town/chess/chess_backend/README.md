@@ -87,6 +87,9 @@ If there is a checkmate, this function will initialize the attribute .winner as 
 To begin, create a .env file located in the same directory as the stockfish.ts.
 In this .env file, put 
 
+## Node Version
+Lastest Node LTS version is recommended. This is because stockfish.ts uses fetch, and fetch is only built into later Node versions. If you get a 'Reference Error: Fetch is not defined' message, update to your Node to the latest LTS (Currently version v20.9.0)
+
 ```PATH_TO_STOCKFISH="path/to/stockfish/.exe"```
 
 Note the path must have FORWARD SLASHES.
