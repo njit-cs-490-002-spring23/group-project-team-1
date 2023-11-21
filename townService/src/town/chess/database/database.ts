@@ -13,7 +13,7 @@ class Database {
   }
 
   /**
-   * Opens connection with local database. Called at the start of a method that needs to view/update the database.
+   * Opens connection with local database. Called at initialization of a new Database object.
    * @returns The connection of type Connection used for queries.
    */
   private _dbConnect() {
