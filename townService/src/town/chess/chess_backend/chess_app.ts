@@ -125,9 +125,32 @@ class ChessGame {
    */
   public matchMoves(moveToMake: string): string {
     const moves = this.getMoves();
-    console.log(moveToMake.slice(0, 2));
-    const piece = this.getPieceOnSquare(moveToMake.slice(0, 2))?.type.toUpperCase();
-    console.log(piece + moveToMake.slice(2, 4));
+    let piece;
+    let moveSpace;
+    const pieceArr = ['r', 'R', 'q', 'Q', 'n', 'N', 'b', 'B', 'k', 'K'];
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    if (moveToMake.length === 2) {
+      piece = '';
+      moveSpace = moveToMake;
+    } else if (moveToMake.length === 3 && pieceArr.includes(moveToMake.slice(0, 1))) {
+      piece = moveToMake.slice(0, 1);
+      moveSpace = moveToMake.slice(1, 3);
+    } else if (moveToMake.length === 4) {
+      if (moveToMake.slice(3, 4) === '#' || moveToMake.slice(3, 4) === '+') {
+        piece = moveToMake.slice(0, 1);
+        moveSpace = moveToMake.slice(1, 3);
+      } else {
+        piece = this.getPieceOnSquare(moveToMake.slice(0, 2))?.type.toUpperCase(); // ??
+        moveSpace = moveToMake.slice(2, 4);
+      }
+    } else if (moveToMake.length === 5) {
+      piece = moveToMake.slice(0, 1);
+      moveSpace = moveToMake.slice(2, 4);
+    } else {
+      piece = 'p';
+      moveSpace = 'O - O';
+    }
+    console.log(piece + moveSpace);
     if (piece) {
       for (let i = 0; i < moves.length; i++) {
         const move = moves[i];
@@ -135,7 +158,8 @@ class ChessGame {
         if (moveToMake[-1] === '#' && moves.includes(moveToMake)) {
           return move;
         }
-        if (move.match(`^${piece + moveToMake.slice(2, 3)}.?`)) {
+        // why isnt this regex working?
+        if (move.match(`^${piece}x?${moveSpace}[+#]?`)) {
           return move;
         }
       }
@@ -169,7 +193,7 @@ class ChessGame {
    */
   public getReasonForGameEnd(): string {
     console.log('WINNER', this.winner);
-    if (!this._game.isGameOver()) return 'Not Over';
+    if (!this._game.isGameOver() && this.winner === -1) return 'Not Over';
     if (this._game.isCheckmate())
       return `Checkmate - ${this.getTurn() === Colors.White ? Colors.Black : Colors.White}`;
     if (this._game.isInsufficientMaterial()) return 'Insufficient Material';
