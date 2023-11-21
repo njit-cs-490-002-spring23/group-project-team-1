@@ -129,6 +129,9 @@ class ChessGame {
     let moveSpace;
     const pieceArr = ['r', 'R', 'q', 'Q', 'n', 'N', 'b', 'B', 'k', 'K'];
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    if (moveToMake === 'O-O' || moveToMake === 'O-O-O') {
+      return moveToMake;
+    }
     if (moveToMake.length === 2) {
       piece = '';
       moveSpace = moveToMake;
