@@ -1,4 +1,11 @@
+/* eslint-disable import/no-duplicates */
+/* eslint-disable import/no-cycle */
+// eslint-disable-next-line import/no-extraneous-dependencies
 import fetch from 'node-fetch';
+import ChessGame from './chess_app';
+import { Colors } from './chess_app';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+// const fetch = require('node-fetch');
 
 class CallStockfish {
   private _elo: number;
@@ -33,16 +40,15 @@ class CallStockfish {
         if (res.ok) {
           return res.json();
         }
-        console.log('something is wrong');
         return {
           status: 400,
         };
       })
-      .then(jsonResponse => {
-        // Log the response data in the console
-        console.log(jsonResponse);
-      })
-      .catch(err => console.error(err));
+      // .then(jsonResponse => {
+      //   // Log the response data in the console
+      //   console.log(jsonResponse);
+      // })
+      .catch(err => err);
   }
 
   /**
@@ -131,5 +137,28 @@ console.log(stockypoo.getMove());
 await stockypoo.getBestMovesList('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
 
 console.log(stockypoo.getMoveList());
+
+const game = new ChessGame(12, 21);
+game.loadFen('rnbqkbnr/ppppp2p/8/5Pp1/8/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2');
+await stockypoo.callStockfish(game.getFen());
+await stockypoo.getBestMovesList(game.getFen());
+console.log(stockypoo.getMoveList());
+console.log(stockypoo.getMove());
+console.log(game.getMoves());
+console.log(game.matchMoves(stockypoo.getMove()));
+game.make_move(game.matchMoves(stockypoo.getMove()), Colors.White);
+console.log(game.getFen());
+console.log(game.getReasonForGameEnd());
+console.log(game.checkIfCheckmate());
+// let move = game.matchMoves(stockypoo.getMove().slice(2, 3));
+// console.log(game.getMoves());
+// console.log(game.make_move(move, Colors.White));
+// console.log(game.getFen());
+// await stockypoo.callStockfish(game.getFen());
+// console.log(stockypoo.getMove());
+// move = game.matchMoves(stockypoo.getMove().slice(2, 3));
+// console.log(game.getMoves());
+// console.log(game.make_move(move, Colors.Black));
+// console.log(game.getFen());
 
 export default CallStockfish;
