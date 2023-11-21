@@ -1,45 +1,62 @@
 import Database from './database';
 
 class MatchResult {
-  // kmw: Currently decided to make it compare Player1 vs Player2 in that order
-  // ex: Player1 vs Player2, if player
-  // (win = 1, draw = 0.5, loss = 0)
   player1_user: string;
 
   player2_user: string;
 
   game_score: number;
 
-  // kmw: Making the assumption that we have already assigned the associated elo ratings and passed the result of the game
+  /**
+   * Initializes the MatchResult object.
+   * The order in which you initialize the parameters matter. The score is from the perspective of Player 1.
+   * {0 = Loss / 0.5 = Draw / 1 = Win}
+   * @param userPlayer1 Username of Player 1 of type string.
+   * @param userPlayer2 Username of Player 2 of type string.
+   * @param score The result in regards to Player 1 {0 = Loss / 0.5 Draw / 1 = Win}.
+   */
   constructor(userPlayer1: string, userPlayer2: string, score: number) {
     this.player1_user = userPlayer1;
     this.player2_user = userPlayer2;
     this.game_score = score;
   }
 
-  // Everything is const because ESLint is a crybaby and we haven't connected to a database yet, jeez man like get over yourself
-  updateElo() {
-    // kmw: will need to grab elo's from database, leaving it at 1500 for now
-    const oldEloPlayer1 = 1500;
-    const oldEloPlayer2 = 1500;
-    // let newEloPlayer1: number;
-    // let newEloPlayer2: number;
-
-    // kmw: k-factor is a weird one, leaving it at 20 for now since it can technically change but for the scope of this project maybe leave it like this
+  /**
+   * Performs the calculations to determine the rating change of both players for a given match result.
+   * @param elo1 ELO of player 1.
+   * @param elo2 ELO of player 2.
+   * @returns Rating Change for both players.
+   */
+  private _calculateRatingChange(elo1: number, elo2: number): number {
     const kFactor = 20;
-    const ratio: number = Math.abs(oldEloPlayer2 - oldEloPlayer1) / 400;
+    const ratio: number = (elo2 - elo1) / 400;
 
     const expectedScore = 1 / (10 ** ratio + 1);
     const ratingChange = kFactor * (this.game_score - expectedScore);
+    return ratingChange;
+  }
 
-    const newEloPlayer1 = oldEloPlayer1 + ratingChange;
-    const newEloPlayer2 = oldEloPlayer2 - ratingChange;
+  /**
+   * Updates the ELO for a given Match Result.
+   * Creates a new Database object and calls db_getELO to get the ELO of a particular player.
+   * Calls _calculateRatingChange to determine the rating change.
+   * Calls db_setELO to set the updated ELO's of both players.
+   */
+  async updateElo() {
+    const database = new Database();
+    const oldEloPlayer1: number = await database.db_getELO(this.player1_user);
+    const oldEloPlayer2: number = await database.db_getELO(this.player2_user);
+
+    const ratingChange = this._calculateRatingChange(oldEloPlayer1, oldEloPlayer2);
+    const newEloPlayer1 = Math.ceil(oldEloPlayer1 + ratingChange);
+    const newEloPlayer2 = Math.ceil(oldEloPlayer2 - ratingChange);
+
+    database.db_setELO(this.player1_user, newEloPlayer1);
+    database.db_setELO(this.player2_user, newEloPlayer2);
+
+    database.dbClose();
   }
 }
 
-//const result = new MatchResult('Deep Blue', 'Deep Blue', 0);
-const ELO = await Database.db_getELO('Deep Blue');
-
-console.log("Here is your elo: " + ELO);
-
-
+const result = new MatchResult('Deep Blue', 'Kevin', 1);
+result.updateElo();
