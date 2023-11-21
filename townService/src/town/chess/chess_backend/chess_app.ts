@@ -129,6 +129,9 @@ class ChessGame {
     let moveSpace;
     const pieceArr = ['r', 'R', 'q', 'Q', 'n', 'N', 'b', 'B', 'k', 'K'];
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    if (moveToMake === 'O-O' || moveToMake === 'O-O-O') {
+      return moveToMake;
+    }
     if (moveToMake.length === 2) {
       piece = '';
       moveSpace = moveToMake;
@@ -139,6 +142,12 @@ class ChessGame {
       if (moveToMake.slice(3, 4) === '#' || moveToMake.slice(3, 4) === '+') {
         piece = moveToMake.slice(0, 1);
         moveSpace = moveToMake.slice(1, 3);
+      } else if (
+        this.getPieceOnSquare(moveToMake.slice(0, 2))?.type === 'p' &&
+        this.getPieceOnSquare(moveToMake.slice(2, 4))?.type === 'p'
+      ) {
+        piece = moveToMake.slice(0, 1);
+        moveSpace = moveToMake.slice(2, 4);
       } else {
         piece = this.getPieceOnSquare(moveToMake.slice(0, 2))?.type.toUpperCase(); // ??
         moveSpace = moveToMake.slice(2, 4);
