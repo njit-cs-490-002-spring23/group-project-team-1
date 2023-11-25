@@ -14,10 +14,12 @@ import {
   ServerToClientEvents,
   SocketData,
   ViewingArea as ViewingAreaModel,
+  GameArea as GameAreaModel
 } from '../types/CoveyTownSocket';
 import ConversationArea from './ConversationArea';
 import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
+import GameArea from './GameArea';
 
 /**
  * The Town class implements the logic for each town: managing the various events that
@@ -282,6 +284,35 @@ export default class Town {
     this._broadcastEmitter.emit('interactableUpdate', area.toModel());
     return true;
   }
+
+  /**
+   * Creates a new game area in this town if there is not currently an active
+   * game with the same ID. The game area ID must match the name of a
+   * game area that exists in this town's map.
+   *
+   * If successful creating the game area, this method:
+   *  Adds any players who are in the region defined by the game area to it.
+   *  Notifies all players in the town that the cgame area has been updated
+   *
+   * @param gameArea Information describing the game area to create. Ignores any
+   *  occupantsById that are set on the game area that is passed to this method.
+   *
+   * @returns true if the game is successfully created, or false if there is no known
+   * fame area with the specified ID or if there is already an active game area
+   * with the specified ID
+   */
+  public addGameArea (gameArea: GameAreaModel): boolean {
+    const area = this._interactables.find(
+      eachArea => eachArea.id === gameArea.id,
+    ) as GameArea;
+    if (!area) {
+      return false;
+    }
+    area.addPlayersWithinBounds(this._players);
+    this._broadcastEmitter.emit('interactableUpdate', area.toModel());
+    return true;
+  }
+
 
   /**
    * Fetch a player's session based on the provided session token. Returns undefined if the

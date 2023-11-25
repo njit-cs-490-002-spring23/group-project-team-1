@@ -22,6 +22,7 @@ import {
   CoveyTownSocket,
   TownSettingsUpdate,
   ViewingArea,
+  GameArea
 } from '../types/CoveyTownSocket';
 
 /**
@@ -156,6 +157,29 @@ export class TownsController extends Controller {
       throw new InvalidParametersError('Invalid values specified');
     }
     const success = town.addViewingArea(requestBody);
+    if (!success) {
+      throw new InvalidParametersError('Invalid values specified');
+    }
+  }
+
+  /**
+   * Creates a game area in a given town
+   * @param townID ID of the town in which to create the new conversation area
+   * @param sessionToken session token of the player making the request, must match the session token returned when the player joined the town
+   * @param requestBody The new conversation area to create
+   */
+  @Post('{townID}/gameArea')
+  @Response<InvalidParametersError>(400, 'Invalid values specified')
+  public async createGameArea(
+    @Path() townID: string,
+    @Header('X-Session-Token') sessionToken: string,
+    @Body() requestBody: GameArea,
+  ): Promise<void> {
+    const town = this._townsStore.getTownByID(townID);
+    if (!town?.getPlayerBySessionToken(sessionToken)) {
+      throw new InvalidParametersError('Invalid values specified');
+    }
+    const success = town.addGameArea(requestBody);
     if (!success) {
       throw new InvalidParametersError('Invalid values specified');
     }

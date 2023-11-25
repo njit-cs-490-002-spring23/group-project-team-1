@@ -32696,13 +32696,13 @@
                  "objectgroup":
                     {
                      "draworder":"index",
-                     "name":"Arcade Cabinet 1",
+                     "name":"",
                      "objects":[
                             {
-                             "type":"",
+                             "type":"GameArea",
                              "height":25.995583882738,
                              "id":1,
-                             "name":"",
+                             "name":"Arcade Cabinet 1",
                              "rotation":0,
                              "visible":true,
                              "width":13.6241915530012,
@@ -32727,13 +32727,13 @@
                  "objectgroup":
                     {
                      "draworder":"index",
-                     "name":"Arcade Cabinet 2",
+                     "name":"",
                      "objects":[
                             {
-                             "type":"",
+                             "type":"GameArea",
                              "height":25.4474842225598,
                              "id":1,
-                             "name":"",
+                             "name":"Arcade Cabinet 2",
                              "rotation":0,
                              "visible":true,
                              "width":31.6331803874282,
@@ -32758,13 +32758,13 @@
                  "objectgroup":
                     {
                      "draworder":"index",
-                     "name":"Arcade Cabinet 3",
+                     "name":"",
                      "objects":[
                             {
-                             "type":"",
+                             "type":"GameArea",
                              "height":26.1521837856461,
                              "id":2,
-                             "name":"",
+                             "name":"Arcade Cabinet 3",
                              "properties":[
                                     {
                                      "name":"collides",
