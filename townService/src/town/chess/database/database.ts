@@ -80,15 +80,17 @@ class Database {
   }
 
   /**
-   * Returns a dictionary of the top ten players based on their ELO score. 
+   * Returns a dictionary of the top ten players based on their ELO score.
    * Must be called with await before function call.
    * @returns Dictionary with key being the username (type string) and value being the ELO (type any)
    */
   async db_getAllELO() {
     let result;
-    var output: { [username: string]: any } = {};
+    const output: { [username: string]: any } = {};
     try {
-      result = await this._db.promise().query<RowDataPacket[]>('SELECT * FROM player_elo ORDER BY ELO DESC LIMIT 10');
+      result = await this._db
+        .promise()
+        .query<RowDataPacket[]>('SELECT * FROM player_elo ORDER BY ELO DESC LIMIT 10');
     } catch (error) {
       return null;
     }
