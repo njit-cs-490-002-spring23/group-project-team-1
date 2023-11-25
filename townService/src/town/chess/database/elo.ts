@@ -56,7 +56,29 @@ class MatchResult {
 
     database.dbClose();
   }
+
+  /**
+   * Static method that is called for the purpose of leaderboard functionality.
+   * Acts as a mediator function to make the connection to the database and call db_getAllELO.
+   * Must be called with await before function call.
+   * @returns Dictionary with key being the username (type string) and value being the ELO (type any)
+   */
+  static async leaderboardElo() {
+    const database = new Database();
+    const output: { [username: string]: any } | null = await database.db_getAllELO();
+    database.dbClose();
+    return output;
+  }
 }
 
 const result = new MatchResult('Deep Blue', 'Kevin', 1);
 result.updateElo();
+
+const output: { [username: string]: any } | null = await MatchResult.leaderboardElo();
+console.log(output);
+for (const key in output) {
+  if (Object.hasOwn(output, key)) {
+    const value = output[key];
+    console.log(`${key} ${value}`);
+  }
+}
