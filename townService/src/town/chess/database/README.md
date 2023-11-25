@@ -123,7 +123,9 @@ The result of the match from the "perspective of player 1". This number can only
 
 For example, if Player 1 beats Player 2, correct initialization of a MatchResult object is as follows:
 
-```const result = new MatchResult('player1', 'player2', 1);```
+```
+const result = new MatchResult('player1', 'player2', 1);
+```
 
 The order matters, so be sure to give extra attention when using this. 
 
