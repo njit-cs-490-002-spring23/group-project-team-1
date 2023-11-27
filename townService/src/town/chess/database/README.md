@@ -75,8 +75,9 @@ Must be called separately, or else the connection will never close by itself.
 Public async method that returns the ELO of a given Username. If the Username exists, the method will return the ELO as type 'any'.
 Correct and intended usage of this function is as follows:
 
-```const database = new Database();```
-```const myELO: number = await database.db_getELO('myName');```
+```const database = new Database();
+const myELO: number = await database.db_getELO('myName');
+```
 
 In the event that you pass a string that is not found in the table, it will instead call **.db_setELO()** and create a new entry of that 
 name and return the default ELO **(._defaultELO)**.
@@ -85,10 +86,24 @@ name and return the default ELO **(._defaultELO)**.
 Public async method that inserts or updates the ELO of the given Username to the given ELO. 
 If the given Username does not exist, it will insert that Username and ELO into the table.
 If the given Username does exist, it will update that Username and ELO in the table.
+
 Correct and intended usage of this function is as follows:
 
-```const database = new Database();```
-```database.db_setELO('myName', 2000);```
+```const database = new Database();
+database.db_setELO('myName', 2000);
+```
+
+## .db_getAllELO() --> dictionary,  { [username: string]: any} | null
+Public async method that returns the top ten usernames and their associated ELOs from the database ordered by their ELO. 
+This uses the connection with the database and makes a query to retrieve this information and store it in a dictionary.
+It returns the dictionary. This is intended to only be called by the MatchResult class' leaderboardElo() function.
+
+Correct and intended usage of this function is as follows:
+
+```
+const database = new Database();
+const output: { [username: string]: any } | null = await database.db_getAllELO();
+```
 
 
 # MatchResult Class Attributes (elo.ts)
@@ -108,7 +123,9 @@ The result of the match from the "perspective of player 1". This number can only
 
 For example, if Player 1 beats Player 2, correct initialization of a MatchResult object is as follows:
 
-```const result = new MatchResult('player1', 'player2', 1);```
+```
+const result = new MatchResult('player1', 'player2', 1);
+```
 
 The order matters, so be sure to give extra attention when using this. 
 
@@ -127,5 +144,24 @@ and then finally calls .dbClose() to close the connection.
 
 Correct and intended usage of this function is as follows:
 
-```const result = new MatchResult('player1', 'player2', 1);```
-```result.updateELO()```
+```
+const result = new MatchResult('player1', 'player2', 1);
+result.updateELO()
+```
+
+## MatchResult.leaderboardElo() --> dictionary,  { [username: string]: any} | null
+Public async and static method that returns a dictionary of the top ten usernames and ELOs from the database
+ordered by ELO. Since the method is static, there is no need to create a MatchResult object to use it. This function
+acts as a mediator function, as it creates the connection to the database for you and calls db_getAllELO in the Database class.
+
+Correct and intended usage of this function is as follows:
+
+```
+const output: { [username: string]: any } | null = await MatchResult.leaderboardElo();
+for (const key in output) {
+  if (Object.hasOwn(output, key)) {
+    // ... do something
+  }
+}
+```
+
