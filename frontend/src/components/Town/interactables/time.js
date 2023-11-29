@@ -126,10 +126,10 @@ const Time = () => {
           </div>
         </div>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridGap: '0px' }}>
-        <Button onClick={minus}>-</Button>
-        <Button onClick={add}>+</Button>
-      </div>
+<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridGap: '0px' }}>
+  <Button id="minusButton" onClick={minus} disabled={isRunning}>-</Button>
+  <Button id="addButton" onClick={add} disabled={isRunning}>+</Button>
+</div>
     </div>
   );
 };
