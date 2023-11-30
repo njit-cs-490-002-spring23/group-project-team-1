@@ -16,15 +16,16 @@ class Database {
    * Opens connection with local database. Called at initialization of a new Database object.
    * @returns The connection of type Connection used for queries.
    */
-  private _dbConnect() {
+  public _dbConnect() {
     if (this._db) {
       console.log('Error!');
     }
     const connection = mysql.createConnection({
       host: 'localhost',
       user: 'root',
-      password: 'coveytown',
+      port: 3306,
       database: 'chesselo',
+      password: '',
     });
     return connection;
   }
@@ -107,3 +108,8 @@ class Database {
 }
 
 export default Database;
+
+const db = new Database();
+if (db._dbConnect()) {
+  console.log('CONNECTED');
+}

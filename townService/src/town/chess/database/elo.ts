@@ -71,6 +71,8 @@ class MatchResult {
   }
 }
 
+export default MatchResult;
+
 const result = new MatchResult('Deep Blue', 'Kevin', 1);
 result.updateElo();
 
