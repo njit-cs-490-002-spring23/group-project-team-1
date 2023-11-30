@@ -1,6 +1,5 @@
 /**
  * TO DO:
- * Implement regex matching for moves passed to function from front end to match move in movelist
  * Make timer count down
  */
 
@@ -126,14 +125,63 @@ class ChessGame {
    */
   public matchMoves(moveToMake: string): string {
     const moves = this.getMoves();
-    for (let i = 0; i < moves.length; i++) {
-      const move = moves[i];
-      // console.log(move);
-      if (moveToMake[-1] === '#' && moves.includes(moveToMake)) {
-        return move;
+    let piece;
+    let moveSpace;
+    const pieceArr = ['r', 'R', 'q', 'Q', 'n', 'N', 'b', 'B', 'k', 'K'];
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    if (moveToMake === 'O-O' || moveToMake === 'O-O-O') {
+      return moveToMake;
+    }
+    if (moveToMake.length === 2) {
+      piece = '';
+      moveSpace = moveToMake;
+    } else if (moveToMake.length === 3 && pieceArr.includes(moveToMake.slice(0, 1))) {
+      piece = moveToMake.slice(0, 1);
+      moveSpace = moveToMake.slice(1, 3);
+    } else if (moveToMake.length === 4) {
+      if (moveToMake.slice(3, 4) === '#' || moveToMake.slice(3, 4) === '+') {
+        piece = moveToMake.slice(0, 1);
+        moveSpace = moveToMake.slice(1, 3);
+      } else if (
+        this.getPieceOnSquare(moveToMake.slice(0, 2))?.type === 'p' &&
+        this.getPieceOnSquare(moveToMake.slice(2, 4))?.type === 'p'
+      ) {
+        piece = moveToMake.slice(0, 1);
+        moveSpace = moveToMake.slice(2, 4);
+      } else {
+        piece = this.getPieceOnSquare(moveToMake.slice(0, 2))?.type.toUpperCase(); // ??
+        moveSpace = moveToMake.slice(2, 4);
       }
-      if (move.match(`^${moveToMake}.?`)) {
-        return move;
+    } else if (moveToMake.length === 5) {
+      piece = moveToMake.slice(0, 1);
+      moveSpace = moveToMake.slice(2, 4);
+    } else {
+      piece = 'p';
+      moveSpace = 'O - O';
+    }
+    console.log(piece + moveSpace);
+    if (piece) {
+      for (let i = 0; i < moves.length; i++) {
+        const move = moves[i];
+        // console.log(move);
+        if (moveToMake[-1] === '#' && moves.includes(moveToMake)) {
+          return move;
+        }
+        // why isnt this regex working?
+        if (move.match(`^${piece}x?${moveSpace}[+#]?`)) {
+          return move;
+        }
+      }
+    } else {
+      for (let i = 0; i < moves.length; i++) {
+        const move = moves[i];
+        // console.log(move);
+        if (moveToMake[-1] === '#' && moves.includes(moveToMake)) {
+          return move;
+        }
+        if (move.match(`^${moveToMake}.?`)) {
+          return move;
+        }
       }
     }
     return 'None';
@@ -154,13 +202,13 @@ class ChessGame {
    */
   public getReasonForGameEnd(): string {
     console.log('WINNER', this.winner);
-    if (this.winner !== -1) return 'Concede';
-    if (!this._game.isGameOver()) return 'Not Over';
+    if (!this._game.isGameOver() && this.winner === -1) return 'Not Over';
     if (this._game.isCheckmate())
       return `Checkmate - ${this.getTurn() === Colors.White ? Colors.Black : Colors.White}`;
     if (this._game.isInsufficientMaterial()) return 'Insufficient Material';
     if (this._game.isThreefoldRepetition()) return 'Three Fold Repetition';
     if (this._game.isDraw()) return 'Draw';
+    if (this.winner !== -1) return 'Concede';
     return 'Not Over';
   }
 
@@ -205,42 +253,47 @@ class ChessGame {
 }
 
 /* Test Area */
-const gamer = new ChessGame(1, 2, 10); // initialize
-console.log(gamer.gameID);
-console.log(gamer.getFen());
-console.log(gamer.getMoves());
-const MOVE = 'e4';
-console.log('MATCH: ', gamer.matchMoves(MOVE));
-// if ('e3+'.match(`^${MOVE}`)) {
-//   console.log('true');
-// }
-console.log(gamer.getHistory());
-gamer.make_move('e4', Colors.White); // make move
-console.log(gamer.getFen());
-console.log(gamer.getTurn() === Colors.Black);
-console.log(gamer.getHistory());
-gamer.make_move('f5', Colors.Black); // make another move
-console.log(gamer.getHistory());
-const hist = gamer.getHistory();
-// console.log(hist['Na3']);
-console.log(gamer.getFen());
-// gamer.loadFen(gamer.getHistory()['Na3']); // revert to old board state from history
-console.log(gamer.getFen());
-console.log(gamer.timer);
-gamer.make_move('Bc4', Colors.White);
-gamer.make_move('g5', Colors.Black);
-console.log(gamer.winner);
-console.log('-------------------');
-console.log(gamer.getFen());
-console.log(gamer.checkIfCheckmate());
-console.log(gamer.getMoves());
-gamer.make_move('exf5', Colors.White);
-gamer.make_move('a5', Colors.Black);
-gamer.make_move('Qh5', Colors.White);
-console.log(gamer.getFen());
-console.log(gamer.checkIfCheckmate());
-console.log(gamer.winner);
-console.log(gamer.getPieceOnSquare('a2'));
-console.log(gamer.getPieceOnSquare('a1')?.type);
+// const gamer = new ChessGame(1, 2, 10); // initialize
+// console.log(gamer.gameID);
+// console.log(gamer.getFen());
+// console.log(gamer.getMoves());
+// const MOVE = 'e4';
+// console.log('MATCH: ', gamer.matchMoves(MOVE));
+// // if ('e3+'.match(`^${MOVE}`)) {
+// //   console.log('true');
+// // }
+// console.log(gamer.getHistory());
+// gamer.make_move('e4', Colors.White); // make move
+// console.log(gamer.getFen());
+// console.log(gamer.getTurn() === Colors.Black);
+// console.log(gamer.getHistory());
+// gamer.make_move('f5', Colors.Black); // make another move
+// console.log(gamer.getHistory());
+// const hist = gamer.getHistory();
+// // console.log(hist['Na3']);
+// console.log(gamer.getFen());
+// // gamer.loadFen(gamer.getHistory()['Na3']); // revert to old board state from history
+// console.log(gamer.getFen());
+// console.log(gamer.timer);
+// gamer.make_move('Bc4', Colors.White);
+// gamer.make_move('g5', Colors.Black);
+// console.log(gamer.winner);
+// console.log('-------------------');
+// console.log(gamer.getFen());
+// console.log(gamer.checkIfCheckmate());
+// console.log(gamer.getMoves());
+// gamer.make_move('exf5', Colors.White);
+// gamer.make_move('a5', Colors.Black);
+// gamer.make_move('Qh5', Colors.White);
+// console.log(gamer.getFen());
+// console.log(gamer.checkIfCheckmate());
+// console.log(gamer.winner);
+// console.log(gamer.getPieceOnSquare('a2'));
+// console.log(gamer.getPieceOnSquare('a1')?.type);
+
+// const stockfish = new CallStockfish(1000);
+// await stockfish.callStockfish(gamer.getFen());
+// const MOVE = stockfish.getMove();
+// console.log(MOVE);
 
 export default ChessGame;
