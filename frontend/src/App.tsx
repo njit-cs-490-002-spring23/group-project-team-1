@@ -26,7 +26,6 @@ function App() {
   const onDisconnect = useCallback(() => {
     townController?.disconnect();
   }, [townController]);
-
   let page: JSX.Element;
   if (townController) {
     page = (

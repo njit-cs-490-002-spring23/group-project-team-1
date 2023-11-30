@@ -502,52 +502,63 @@
                  "type":"ConversationArea",
                  "height":125.333,
                  "id":29,
-                 "name":"Basement Lounge",
+                 "name":"Chess Looge",
                  "rotation":0,
                  "visible":true,
                  "width":134.000333333333,
                  "x":2943.6665,
                  "y":1028.66683333333
-                }, 
+                },
                 {
-                 "type":"ConversationArea",
-                 "height":223.999666666667,
-                 "id":30,
-                 "name":"Basement Dining Table 1",
-                 "rotation":0,
-                 "visible":true,
-                 "width":164.667,
-                 "x":3260.99983333333,
-                 "y":1056.00016666667
-                }, 
-                {
-                 "type":"ConversationArea",
-                 "height":224,
-                 "id":31,
-                 "name":"Basement Dining Table 2",
-                 "rotation":0,
-                 "visible":true,
-                 "width":164.667,
-                 "x":3482.99983333333,
-                 "y":1058.66666666667
-                }, 
-                {
-                 "type":"ViewingArea",
-                 "height":123.333333333333,
-                 "id":35,
-                 "name":"Fish tank",
-                 "properties":[
-                        {
-                         "name":"video",
-                         "type":"string",
-                         "value":"https:\/\/www.youtube.com\/watch?v=l40Ef1dg-6s"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":141.666666666667,
-                 "x":3248.33333333333,
-                 "y":868.333333333333
-                }, 
+                     "type":"ConversationArea",
+                     "height":125.333,
+                     "id":32,
+                     "name":"Leaderboard",
+                     "rotation":0,
+                     "visible":true,
+                     "width":34.000333333333,
+                     "x":3143.6665,
+                     "y":1028.66683333333
+                    },
+                    {
+                     "type":"ConversationArea",
+                     "height":223.999666666667,
+                     "id":30,
+                     "name":"Basement Dining Table 1",
+                     "rotation":0,
+                     "visible":true,
+                     "width":164.667,
+                     "x":3260.99983333333,
+                     "y":1056.00016666667
+                    }, 
+                    {
+                     "type":"ConversationArea",
+                     "height":224,
+                     "id":31,
+                     "name":"Basement Dining Table 2",
+                     "rotation":0,
+                     "visible":true,
+                     "width":164.667,
+                     "x":3482.99983333333,
+                     "y":1058.66666666667
+                    }, 
+                    {
+                     "type":"ViewingArea",
+                     "height":123.333333333333,
+                     "id":35,
+                     "name":"Fish tank",
+                     "properties":[
+                            {
+                             "name":"video",
+                             "type":"string",
+                             "value":"https:\/\/www.youtube.com\/watch?v=l40Ef1dg-6s"
+                            }],
+                     "rotation":0,
+                     "visible":true,
+                     "width":41.666666666667,
+                     "x":3348.33333333333,
+                     "y":868.333333333333
+                    }, 
                 {
                  "type":"ViewingArea",
                  "height":150.833333333333,

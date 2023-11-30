@@ -74,6 +74,13 @@ export default function NewConversationModal(): JSX.Element {
     }
   }, [topic, setTopic, coveyTownController, newConversation, closeModal, toast]);
 
+  const currentleaderboard = {
+    'ahmed': 2000,
+    'deepblue': 300,
+    'roblox': 3405,
+    'roblox lover': 1000,
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -83,7 +90,7 @@ export default function NewConversationModal(): JSX.Element {
       }}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Create a conversation in {newConversation?.name} </ModalHeader>
+        <ModalHeader>{newConversation?.name} </ModalHeader>
         <ModalCloseButton />
         <form
           onSubmit={ev => {
@@ -92,22 +99,22 @@ export default function NewConversationModal(): JSX.Element {
           }}>
           <ModalBody pb={6}>
             <FormControl>
-              <FormLabel htmlFor='topic'>Topic of Conversation</FormLabel>
-              <Input
-                id='topic'
-                placeholder='Share the topic of your conversation'
-                name='topic'
-                value={topic}
-                onChange={e => setTopic(e.target.value)}
-              />
+              <FormLabel htmlFor='topic'>Top 10 Chess Users</FormLabel>
+              <table>
+                <tr>
+                  <th>Username </th>
+                  <th> Elo</th>
+                </tr>
+                {Object.entries(currentleaderboard).map(([playerName, elo]) => (
+                  <tr role='row' key={playerName}>
+                    <td role='gridcell'>{playerName}</td>
+                    <td role='gridcell'>{elo}</td>
+                  </tr>
+                ))}
+              </table>
             </FormControl>
           </ModalBody>
-          <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={createConversation}>
-              Create
-            </Button>
-            <Button onClick={closeModal}>Cancel</Button>
-          </ModalFooter>
+          <ModalFooter></ModalFooter>
         </form>
       </ModalContent>
     </Modal>
