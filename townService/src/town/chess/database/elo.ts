@@ -82,3 +82,4 @@ for (const key in output) {
     console.log(`${key} ${value}`);
   }
 }
+export default MatchResult.leaderboardElo;
