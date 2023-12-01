@@ -1,4 +1,8 @@
+import Express from 'express';
 import Database from './database';
+
+const app = Express();
+app.use(Express.json());
 
 class MatchResult {
   player1_user: string;
@@ -71,15 +75,51 @@ class MatchResult {
   }
 }
 
-const result = new MatchResult('Deep Blue', 'Kevin', 1);
-result.updateElo();
+// const result = new MatchResult('Deep Blue', 'Kevin', 1);
+// result.updateElo();
 
-const output: { [username: string]: any } | null = await MatchResult.leaderboardElo();
-console.log(output);
-for (const key in output) {
-  if (Object.hasOwn(output, key)) {
-    const value = output[key];
-    console.log(`${key} ${value}`);
-  }
-}
-export default MatchResult.leaderboardElo;
+// const output: { [username: string]: any } | null = await MatchResult.leaderboardElo();
+// console.log(output);
+// for (const key in output) {
+//   if (Object.hasOwn(output, key)) {
+//     const value = output[key];
+//     console.log(`${key} ${value}`);
+//   }
+// }
+
+app.use((req, res, next) => {
+  const filler = req;
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, PUT, POST');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
+
+app.post('/updateElo', async (req, res) => {
+  const { player1, player2, score } = req.body;
+  const result = new MatchResult(player1, player2, score);
+  await result.updateElo();
+  res.send({ message: 'ELO updated successfully' });
+});
+
+app.get('/leaderboard', async (req, res) => {
+  const db = new Database();
+  const filler = req;
+  const leaderboard = await db.db_getAllELO();
+  console.log(leaderboard);
+  res.send(leaderboard);
+});
+
+app.get('/elo', async (req, res) => {
+  const filler = res;
+  const db = new Database();
+  const playerName = req.body.name;
+  console.log(playerName);
+  // db.db_getELO(playerName);
+});
+
+app.listen(3001, () => {
+  console.log('Server is running on port 3001');
+});
+
+export default MatchResult;

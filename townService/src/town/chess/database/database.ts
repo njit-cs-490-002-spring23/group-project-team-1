@@ -23,7 +23,7 @@ class Database {
     const connection = mysql.createConnection({
       host: 'localhost',
       user: 'root',
-      password: 'coveytown',
+      password: 'daphne99',
       database: 'chesselo',
     });
     return connection;
@@ -105,5 +105,13 @@ class Database {
     return output;
   }
 }
+
+// const db = new Database();
+// if (db) {
+//   console.log('CONNECTED');
+// }
+// const list = await db.db_getAllELO();
+// console.log(list);
+// db.dbClose();
 
 export default Database;
