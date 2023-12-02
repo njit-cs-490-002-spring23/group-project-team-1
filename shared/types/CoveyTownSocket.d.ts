@@ -72,9 +72,9 @@ export interface ViewingArea {
 
 export interface GameArea {
   id: string;
-  playersByID?: string[];
-  spectatorsByID?: string[];
   gameID?: string;
+  chosenGame?: string;
+  occupantsByID: string[];
 }
 
 export interface ServerToClientEvents {

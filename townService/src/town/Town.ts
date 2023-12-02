@@ -305,9 +305,10 @@ export default class Town {
     const area = this._interactables.find(
       eachArea => eachArea.id === gameArea.id,
     ) as GameArea;
-    if (!area) {
+    if (!area || !gameArea.chosenGame || !area.chosenGame) {
       return false;
     }
+    area.chosenGame = gameArea.chosenGame;
     area.addPlayersWithinBounds(this._players);
     this._broadcastEmitter.emit('interactableUpdate', area.toModel());
     return true;
@@ -383,7 +384,13 @@ export default class Town {
         ConversationArea.fromMapObject(eachConvAreaObj, this._broadcastEmitter),
       );
 
-    this._interactables = this._interactables.concat(viewingAreas).concat(conversationAreas);
+    const gameAreas = objectLayer.objects
+      .filter(eachObject => eachObject.type === 'GameArea')
+      .map(eachGameAreaObj =>
+        GameArea.fromMapObject(eachGameAreaObj, this._broadcastEmitter),
+      );
+
+    this._interactables = this._interactables.concat(viewingAreas).concat(conversationAreas).concat(gameAreas);
     this._validateInteractables();
   }
 

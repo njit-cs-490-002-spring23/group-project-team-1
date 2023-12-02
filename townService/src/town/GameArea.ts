@@ -4,14 +4,11 @@ import { BoundingBox, GameArea as GameAreaModel, TownEmitter } from '../types/Co
 import InteractableArea from './InteractableArea';
 
 export default class GameArea extends InteractableArea {
-  /* The players in the chess area, or undefined if there are no players */
-  public playersByID?: string[];
-
-  /* The spectators in the chess area, or undefined if there are no spectators */
-  public spectatorsByID?: string[];
-
   /* The game ID of the current chess game of the chess area, or undefined if no game is in progress */
   public gameID?: string;
+
+  /* The type of game being played. The default is chess. */
+  public chosenGame?: string;
 
   /** The chess area is "active" when there are players inside of it */
   public get isActive(): boolean {
@@ -41,7 +38,7 @@ export default class GameArea extends InteractableArea {
     super.remove(player);
     if (this._occupants.length === 0) {
       this.gameID = undefined;
-      this.playersByID = undefined;
+      this.chosenGame = undefined;
       this._emitAreaChanged();
     }
   }
@@ -53,11 +50,12 @@ export default class GameArea extends InteractableArea {
   public toModel(): GameAreaModel {
     return {
       id: this.id,
-      playersByID: this.playersByID,
-      spectatorsByID: this.spectatorsByID,
+      occupantsByID: this.occupantsByID,
       gameID: this.gameID,
+      chosenGame: this.chosenGame,
     };
   }
+
 
   /**
    * Creates a new ChessArea object that will represent a Chess Area object in the town map.
@@ -71,10 +69,6 @@ export default class GameArea extends InteractableArea {
       throw new Error(`Malformed chess area ${name}`);
     }
     const rect: BoundingBox = { x: mapObject.x, y: mapObject.y, width, height };
-    return new GameArea(
-      { id: name, playersByID: [], spectatorsByID: [], gameID: undefined },
-      rect,
-      broadcastEmitter,
-    );
+    return new GameArea({ id: name, occupantsByID: [] }, rect, broadcastEmitter);
   }
 }

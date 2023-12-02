@@ -2,41 +2,43 @@ import EventEmitter from 'events';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import TypedEmitter from 'typed-emitter';
-import { ConversationArea as ConversationAreaModel } from '../types/CoveyTownSocket';
+import { GameArea as GameAreaModel } from '../types/CoveyTownSocket';
 import PlayerController from './PlayerController';
 
 /**
  * The events that the ConversationAreaController emits to subscribers. These events
  * are only ever emitted to local components (not to the townService).
  */
-export type ConversationAreaEvents = {
-  topicChange: (newTopic: string | undefined) => void;
+export type GameAreaEvents = {
+  gameChange: (newTopic: string | undefined) => void;
   occupantsChange: (newOccupants: PlayerController[]) => void;
 };
 
 // The special string that will be displayed when a conversation area does not have a topic set
-export const NO_TOPIC_STRING = '(No topic)';
+export const NO_TOPIC_STRING = '(No game)';
 /**
  * A ConversationAreaController manages the local behavior of a conversation area in the frontend,
  * implementing the logic to bridge between the townService's interpretation of conversation areas and the
  * frontend's. The ConversationAreaController emits events when the conversation area changes.
  */
-export default class ConversationAreaController extends (EventEmitter as new () => TypedEmitter<ConversationAreaEvents>) {
+export default class GameAreaController extends (EventEmitter as new () => TypedEmitter<GameAreaEvents>) {
   private _occupants: PlayerController[] = [];
 
   private _id: string;
 
-  private _topic?: string;
+  private _gameID?: string;
+
+  private _chosenGame?: string;
 
   /**
    * Create a new ConversationAreaController
    * @param id
-   * @param topic
+   * @param chosenGame
    */
-  constructor(id: string, topic?: string) {
+  constructor(id: string, chosenGame?: string) {
     super();
     this._id = id;
-    this._topic = topic;
+    this._chosenGame = chosenGame;
   }
 
   /**
@@ -69,33 +71,34 @@ export default class ConversationAreaController extends (EventEmitter as new () 
    *
    * Setting the topic to the value `undefined` will indicate that the conversation area is not active
    */
-  set topic(newTopic: string | undefined) {
-    if (this._topic !== newTopic) {
-      this.emit('topicChange', newTopic);
+  set chosenGame(newGame: string | undefined) {
+    if (this._chosenGame !== newGame) {
+      this.emit('gameChange', newGame);
     }
-    this._topic = newTopic;
+    this._chosenGame = newGame;
   }
 
-  get topic(): string | undefined {
-    return this._topic;
+  get chosenGame(): string | undefined {
+    return this._chosenGame;
   }
 
   /**
    * A conversation area is empty if there are no occupants in it, or the topic is undefined.
    */
   isEmpty(): boolean {
-    return this._topic === undefined || this._occupants.length === 0;
+    return this._chosenGame === undefined || this._occupants.length === 0;
   }
 
   /**
    * Return a representation of this ConversationAreaController that matches the
    * townService's representation and is suitable for transmitting over the network.
    */
-  toConversationAreaModel(): ConversationAreaModel {
+  toGameAreaModel(): GameAreaModel {
     return {
       id: this.id,
       occupantsByID: this.occupants.map(player => player.id),
-      topic: this.topic,
+      gameID: this._gameID,
+      chosenGame: this._chosenGame
     };
   }
 
@@ -105,12 +108,12 @@ export default class ConversationAreaController extends (EventEmitter as new () 
    * @param playerFinder A function that will return a list of PlayerController's
    *                     matching a list of Player ID's
    */
-  static fromConversationAreaModel(
-    convAreaModel: ConversationAreaModel,
+  static fromGameAreaModel(
+    gameAreaModel: GameAreaModel,
     playerFinder: (playerIDs: string[]) => PlayerController[],
-  ): ConversationAreaController {
-    const ret = new ConversationAreaController(convAreaModel.id, convAreaModel.topic);
-    ret.occupants = playerFinder(convAreaModel.occupantsByID);
+  ): GameAreaController {
+    const ret = new GameAreaController(gameAreaModel.id, gameAreaModel.chosenGame);
+    ret.occupants = playerFinder(gameAreaModel.occupantsByID);
     return ret;
   }
 }
@@ -120,7 +123,7 @@ export default class ConversationAreaController extends (EventEmitter as new () 
  *
  * This hook will re-render any components that use it when the set of occupants changes.
  */
-export function useConversationAreaOccupants(area: ConversationAreaController): PlayerController[] {
+export function useConversationAreaOccupants(area: GameAreaController): PlayerController[] {
   const [occupants, setOccupants] = useState(area.occupants);
   useEffect(() => {
     area.addListener('occupantsChange', setOccupants);
@@ -137,13 +140,13 @@ export function useConversationAreaOccupants(area: ConversationAreaController): 
  *
  * This hook will re-render any components that use it when the topic changes.
  */
-export function useConversationAreaTopic(area: ConversationAreaController): string {
-  const [topic, setTopic] = useState(area.topic);
+export function useGameAreaTopic(area: GameAreaController): string {
+  const [chosenGame, setGame] = useState(area.chosenGame);
   useEffect(() => {
-    area.addListener('topicChange', setTopic);
+    area.addListener('gameChange', setGame);
     return () => {
-      area.removeListener('topicChange', setTopic);
+      area.removeListener('gameChange', setGame);
     };
   }, [area]);
-  return topic || NO_TOPIC_STRING;
+  return chosenGame || NO_TOPIC_STRING;
 }
