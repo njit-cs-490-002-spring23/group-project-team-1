@@ -1,9 +1,7 @@
-/* eslint-disable import/no-duplicates */
 /* eslint-disable import/no-cycle */
 // eslint-disable-next-line import/no-extraneous-dependencies
 import fetch from 'node-fetch';
-import ChessGame from './chess_app';
-import { Colors } from './chess_app';
+import ChessGame, { Colors } from './chess_app';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 // const fetch = require('node-fetch');
 

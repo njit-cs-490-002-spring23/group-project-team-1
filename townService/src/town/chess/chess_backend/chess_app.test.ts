@@ -1,6 +1,4 @@
-/* eslint-disable import/no-duplicates */
-import ChessGame from './chess_app';
-import { Colors } from './chess_app';
+import ChessGame, { Colors } from './chess_app';
 
 /** To run this file, do
  * npx jest --watch .\chess_app.test.ts
