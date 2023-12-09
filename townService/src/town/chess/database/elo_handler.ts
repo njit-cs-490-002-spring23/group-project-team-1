@@ -1,4 +1,4 @@
-import MatchResult from './elo';
+import { MatchResult } from './elo';
 
 let match;
 
