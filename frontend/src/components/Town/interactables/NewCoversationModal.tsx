@@ -26,9 +26,10 @@ const BASEURL = 'http://localhost:5757';
   const [currentleaderboard, setLeaderboard] = useState({});
  // const [currentFen, setFen] = useState({});
   let chess = new Chess(); // <- 1
-  let [fen, setFen] = useState("start"); // <- 2
+  const [fen, setFen] = useState("start"); // <- 2
   const [over, setOver] = useState("");
-  let turn:string;
+  let turn;
+
 useEffect(() => {
   fetch('http://localhost:5757/initialize/?player1=1&player2=2', {
     method: 'POST',
@@ -39,8 +40,41 @@ useEffect(() => {
   });
   
 }, []);
-  async function onDrop(sourceSquare: any, targetSquare: any) {
 
+  function matchMove(piece: string, move: string, moveList: string[], moveFrom: string, moveTo: string): string {
+    if (moveList.includes(move)) 
+      return move;
+    
+    if (piece !== 'P') {
+      console.log(`${move}`);
+      for (let i = 0; i < moveList.length; i++) {
+        const tempMove = moveList[i];
+
+        if (tempMove.match(`^${piece}x?${moveTo}[+#]?`)) {
+          console.log(`Found! ${move}`);
+          console.log(`Found! ${tempMove}`);
+          return tempMove;
+        }
+      }
+    }
+    else if (piece === 'P') {
+      console.log('Pawn');
+      console.log(`${move}`);
+      for (let i = 0; i < moveList.length; i++) {
+        const tempMove = moveList[i];
+
+        if (tempMove.match(`^${moveFrom.slice(0,1)}x?${moveTo}[+#]?`)) {
+          console.log(`Found! ${move}`);
+          console.log(`Found! ${tempMove}`);
+          return tempMove;
+        }
+      }
+    }
+    return move;
+  }
+
+  async function onDrop(sourceSquare: any, targetSquare: any) {
+    console.log(fen);
     const moveData = {
       from: sourceSquare,
       to: targetSquare,
@@ -48,13 +82,25 @@ useEffect(() => {
       promotion: "q", // promote to queen where possible
     };
     console.log(moveData.color, "move data color");
-    const move = makeAMove(moveData);
+    //const move = makeAMove(moveData);
+    const pieceResponse = await axios.get(`${BASEURL}/piece/${moveData.from}`);
+    const pieceData = pieceResponse.data;
+    const piece = pieceData.piece.toUpperCase();
 
+    const { moves } = (await axios.get(`${BASEURL}/moves`)).data;
+    console.log(`MOVES!!!!!!!!!!!!!!!! ${moves}`);
+
+    let move = piece === 'P' ? `${moveData.to}` : `${piece}${moveData.to}`;
+
+    console.log(`Before ${move}`);
+    move = matchMove(piece, move, moves, moveData.from, moveData.to);
+    console.log(`After ${move}`);
+
+    //const move = `${moveData.to}`;
     // illegal move
     if (move === null) return false;
-    //let fen:string = chess.fen();
-    //setFen(fen);
-    setFen(chess.fen());
+    
+    //setFen(chess.fen());
     const turnResponse = await axios.get(`${BASEURL}/turn`);
     if (turnResponse.data.code !== 200) {
       console.error('Error getting turn:', turnResponse.data);
@@ -62,12 +108,23 @@ useEffect(() => {
     }
     turn = turnResponse.data;
     console.log(turn);
-    const moveResponse = await axios.post(`${BASEURL}/move/${move}/?color=${turn}`);
+    console.log(move);
+    if (move.match('.+#$')) {
+      console.log('Edited');
+      move = move.slice(0,move.length - 1);
+    }
+    console.log(move);
+    const moveResponse = await axios.post(`${BASEURL}/move/${move}/?color=${turn.turn}`);
 
+    console.log(moveResponse);
     if (moveResponse.data.code !== 200) {
       console.error('Error making move:', moveData.color);
       return false;
     }
+
+    let newFen = await axios.get(`${BASEURL}/fen`);
+    console.log(newFen.data.fen);
+    setFen(newFen.data.fen);
     //let newFen = chess.fen();
     //setFen(newFen);    
     //fen=newFen;
