@@ -42,6 +42,8 @@ export default class ChessHandler {
    */
   static async makeMove(req, res) {
     console.log(game.getMoves());
+    console.log(`req.params.move = ${req.params.move}`);
+    console.log(`req.query.color = ${req.query.color}`);
     if (req.params.move && req.query.color) {
       if (req.query.color === 'w') game.make_move(game.matchMoves(req.params.move), Colors.White);
       else if (req.query.color === 'b')
@@ -93,6 +95,7 @@ export default class ChessHandler {
   static async loadFen(req, res) {
     const oldFen = game.getFen();
     let response;
+    console.log(`Req body fen: ${req.body.fen}`);
     if (game.loadFen(req.body.fen))
       response = { code: 200, prevFen: oldFen, newFen: game.getFen() };
     else response = { code: 400, message: 'Failed to load new fen.', prevFen: oldFen };

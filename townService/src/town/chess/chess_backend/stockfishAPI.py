@@ -56,8 +56,13 @@ def postME():
    bestMove = get_top_move(data)
    print("out of function in stockfish")
    print(bestMove)
-   bestMove = jsonify(bestMove)
-   return bestMove
+   stockfish.make_moves_from_current_position([bestMove]) #added
+   newFen = stockfish.get_fen_position() #added
+   print(newFen) #added
+   newFen = jsonify(newFen) #added
+   return newFen #added
+   #bestMove = jsonify(bestMove)
+   #return bestMove
 
 @app.route("/movelist", methods=["POST"])
 def moveList():

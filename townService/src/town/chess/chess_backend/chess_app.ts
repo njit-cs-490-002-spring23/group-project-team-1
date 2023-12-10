@@ -74,11 +74,16 @@ class ChessGame {
    * @returns The new FEN string of the board so the visual could be updated.
    */
   public make_move(moveToMake: string, color: Colors): string {
+    console.log('in make move');
+    console.log(this._preMoveChecks());
+    console.log(moveToMake);
+    console.log(this.getTurn());
     if (
       this._preMoveChecks() &&
       (this._game.moves().includes(moveToMake) || this.matchMoves(moveToMake) !== 'None') &&
       color === this._game.turn()
     ) {
+      console.log('in if');
       this._game.move(moveToMake);
       this._history[moveToMake] = this.getFen();
     } else {
@@ -218,6 +223,7 @@ class ChessGame {
    * @returns True if the board was successfully loaded, false otherwise.
    */
   public loadFen(fen: string): boolean {
+    console.log(`LOADING!!!!! ${fen}`);
     this._game.load(fen);
     if (this.getFen() === fen) return true;
     return false;

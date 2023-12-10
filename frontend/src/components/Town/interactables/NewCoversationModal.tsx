@@ -3,6 +3,7 @@ import {
   Modal,
   ModalCloseButton,
   ModalContent,
+  ModalFooter,
   ModalHeader,
   ModalOverlay,
 } from '@chakra-ui/react';
@@ -17,6 +18,8 @@ export default function NewConversationModal(): Promise<JSX.Element> {
  
 
 const BASEURL = 'http://localhost:5757';
+const STOCKFISHFLAG: boolean = false;
+
   // const currentleaderboard: { [username: string]: any } = leaderboardElo;
   const coveyTownController = useTownController();
   const newConversation = useInteractable('conversationArea');
@@ -27,7 +30,8 @@ const BASEURL = 'http://localhost:5757';
  // const [currentFen, setFen] = useState({});
   let chess = new Chess(); // <- 1
   const [fen, setFen] = useState("start"); // <- 2
-  const [over, setOver] = useState("");
+  const [over, setOver] = useState('Not Over');
+  const [inputFen, setInputFen] = useState('');
   let turn;
 
 useEffect(() => {
@@ -63,9 +67,11 @@ useEffect(() => {
       for (let i = 0; i < moveList.length; i++) {
         const tempMove = moveList[i];
 
-        if (tempMove.match(`^${moveFrom.slice(0,1)}x?${moveTo}[+#]?`)) {
+        if (tempMove.match(`^${moveFrom.slice(0,1)}?x?${moveTo}(\=Q)?[+#]?`)) {
           console.log(`Found! ${move}`);
           console.log(`Found! ${tempMove}`);
+          if (tempMove.includes('='))
+            return tempMove.replace('N', 'Q');
           return tempMove;
         }
       }
@@ -73,7 +79,47 @@ useEffect(() => {
     return move;
   }
 
+  async function stockfishMove(currfen: string) {
+    const initResponse = (await axios.post(`${BASEURL}/stockfishinit/3000`)).data;
+    if (initResponse.status !== 200) 
+      console.log('Error!');
+
+    console.log(`Init Response (83): ${initResponse}`);
+
+    // let {move} = (await axios.get(`${BASEURL}/stockfishmove`, {data: {fen: currfen} })).data;
+    // console.log(move);
+    //let moveResponse = await axios.get(`${BASEURL}/stockfishmove`, {fen: currfen} );
+
+    let newFen: string;
+    newFen = 'abc';
+
+    await axios
+    // eslint-disable-next-line object-shorthand
+    .post(`${BASEURL}/stockfishmove`, { data: { fen: currfen } })
+    .then(response => response.data)
+    // eslint-disable-next-line no-return-assign
+    .then(data => (newFen = data.move))
+    .catch(e => console.log(e));
+
+    console.log(`This is newFen (100): ${newFen}`);
+
+    await axios
+    // eslint-disable-next-line object-shorthand
+    .post(`${BASEURL}/load`,  { fen: newFen } )
+    .then(response => response.data)
+    // eslint-disable-next-line no-return-assign
+    .then(data => (console.log(`Loaded ${newFen}`)))
+    .catch(e => console.log(e));
+    //const moveResponse = await axios.post(`${BASEURL}/move/${move}/?color=b`);
+
+    setFen(newFen);
+  }
+
   async function onDrop(sourceSquare: any, targetSquare: any) {
+    if (over !== 'Not Over') {
+      console.log(over);
+      return;
+    }
     console.log(fen);
     const moveData = {
       from: sourceSquare,
@@ -101,12 +147,16 @@ useEffect(() => {
     if (move === null) return false;
     
     //setFen(chess.fen());
-    const turnResponse = await axios.get(`${BASEURL}/turn`);
-    if (turnResponse.data.code !== 200) {
-      console.error('Error getting turn:', turnResponse.data);
-      return false;
+    if (!STOCKFISHFLAG) {
+      const turnResponse = await axios.get(`${BASEURL}/turn`);
+      if (turnResponse.data.code !== 200) {
+        console.error('Error getting turn:', turnResponse.data);
+        return false;
+      }
+      turn = turnResponse.data.turn;
+    } else {
+      turn = 'w';
     }
-    turn = turnResponse.data;
     console.log(turn);
     console.log(move);
     if (move.match('.+#$')) {
@@ -114,7 +164,15 @@ useEffect(() => {
       move = move.slice(0,move.length - 1);
     }
     console.log(move);
-    const moveResponse = await axios.post(`${BASEURL}/move/${move}/?color=${turn.turn}`);
+
+    const turnResponse = await axios.get(`${BASEURL}/turn`);
+      if (turnResponse.data.code !== 200) {
+        console.error('Error getting turn:', turnResponse.data);
+        return false;
+      }
+    console.log(`Turn: ${turnResponse.data.turn}`);
+  
+    const moveResponse = await axios.post(`${BASEURL}/move/${move}/?color=${turn}`);
 
     console.log(moveResponse);
     if (moveResponse.data.code !== 200) {
@@ -130,6 +188,14 @@ useEffect(() => {
     //fen=newFen;
     //console.log(`NEW FEN for real: ${newFen}`);
     
+    if (STOCKFISHFLAG) {
+      await stockfishMove(newFen.data.fen);
+    }
+
+    let isOver = (await axios.get(`${BASEURL}/reason`)).data;
+    setOver(isOver.reason);
+    console.log(`Over: ${over}`);
+
     return true;
   }
   const makeAMove = useCallback(
@@ -178,6 +244,22 @@ useEffect(() => {
       coveyTownController.interactEnd(newConversation);
     }
   }, [coveyTownController, newConversation]);
+
+  const handleSubmit = async (event: any) => {
+    event.preventDefault();
+
+    await axios
+    // eslint-disable-next-line object-shorthand
+    .post(`${BASEURL}/load`,  { fen: inputFen } )
+    .then(response => response.data)
+    // eslint-disable-next-line no-return-assign
+    .then(data => (console.log(`Loaded ${inputFen}`)))
+    .catch(e => console.log(e));
+    //const moveResponse = await axios.post(`${BASEURL}/move/${move}/?color=b`);
+
+    setFen(inputFen);
+  }
+
   return (
     <Modal
       isOpen={isOpen}
@@ -204,7 +286,10 @@ useEffect(() => {
         <Button onClick={() => setShowTimer(!showTimer)}>Toggle Timer</Button>
         {showTimer && <Time />}
     <Button onClick={() => setShowChess(!showChess)}>start chess</Button>
-    <Chessboard position={fen} onPieceDrop={onDrop} />;
+    <Chessboard position={fen} onPieceDrop={onDrop} autoPromoteToQueen={true}/>
+      <form onSubmit={handleSubmit}>
+      <input type='text' value={inputFen} onChange={(e) => setInputFen(e.target.value)}/>
+      </form>
       </ModalContent>
     </Modal>
   );  
