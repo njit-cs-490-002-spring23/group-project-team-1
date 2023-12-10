@@ -45,9 +45,30 @@ useEffect(() => {
   
 }, []);
 
-  function matchMove(piece: string, move: string, moveList: string[], moveFrom: string, moveTo: string): string {
+  function matchMove(piece: string, move: string, moveList: string[], moveFrom: string, moveTo: string, fen: string, color: string): string {
     if (moveList.includes(move)) 
       return move;
+    else if (piece === 'K') {
+      const fenArray = fen.split(' ');
+      const castlingRights = fenArray[2];
+
+      if (color === 'w') {
+        if (moveTo === 'c1' && castlingRights.includes('Q') && moveList.includes('O-O-O')) {
+          return 'O-O-O';
+        }
+        if (moveTo === 'g1' && castlingRights.includes('K') && moveList.includes('O-O')) {
+          return 'O-O';
+        }
+      }
+      else if (color === 'b') {
+        if (moveTo === 'c8' && castlingRights.includes('q') && moveList.includes('O-O-O')) {
+          return 'O-O-O';
+        }
+        if (moveTo === 'g8' && castlingRights.includes('k') && moveList.includes('O-O')) {
+          return 'O-O';
+        }
+      }
+    }
     
     if (piece !== 'P') {
       console.log(`${move}`);
@@ -139,7 +160,7 @@ useEffect(() => {
     let move = piece === 'P' ? `${moveData.to}` : `${piece}${moveData.to}`;
 
     console.log(`Before ${move}`);
-    move = matchMove(piece, move, moves, moveData.from, moveData.to);
+    move = matchMove(piece, move, moves, moveData.from, moveData.to, fen, pieceData.color);
     console.log(`After ${move}`);
 
     //const move = `${moveData.to}`;
