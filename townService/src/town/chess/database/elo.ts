@@ -1,6 +1,6 @@
 import Database from './database';
 
-class MatchResult {
+export default class MatchResult {
   player1_user: string;
 
   player2_user: string;
@@ -71,14 +71,14 @@ class MatchResult {
   }
 }
 
-const result = new MatchResult('Deep Blue', 'Kevin', 1);
-result.updateElo();
+// const result = new MatchResult('Deep Blue', 'Kevin', 1);
+// result.updateElo();
 
-const output: { [username: string]: any } | null = await MatchResult.leaderboardElo();
-console.log(output);
-for (const key in output) {
-  if (Object.hasOwn(output, key)) {
-    const value = output[key];
-    console.log(`${key} ${value}`);
-  }
-}
+// const output: { [username: string]: any } | null = await MatchResult.leaderboardElo();
+// console.log(output);
+// for (const key in output) {
+//   if (Object.hasOwn(output, key)) {
+//     const value = output[key];
+//     console.log(`${key} ${value}`);
+//   }
+// }
