@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import fetch from 'node-fetch';
 //basic timer
+import axios from 'axios';
+
 //TODO - add turns to switch countdown, add winner call if a timer hits 0
-//https://codesandbox.io/p/sandbox/react-buttons-and-tabs-forked-7gz6c7?file=%2Fsrc%2FApp.js%3A80%2C1 basic outline for the code 
 const theme = {
   blue: {
     default: "#3f51b5",
@@ -35,6 +37,10 @@ Button.defaultProps = {
 };
 //white timer
 const TimerW = ({ minutes = 0, seconds = 0 }) => {
+  if (minutes === 0 && seconds === 0) {
+    console.log('TimerW has reached 0:00');
+  }
+
   return (
     <div>
       {minutes > 10 ? "∞" : `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`}
@@ -51,39 +57,81 @@ const TimerB = ({ minutes = 0, seconds = 0 }) => {
 };
 //base line timer
 const Time = () => {
-  const [delay, setDelay] = useState(180);
+  const [delayW, setDelayW] = useState(180); // White timer delay
+  const [delayB, setDelayB] = useState(180); // Black timer delay
   const [isRunning, setIsRunning] = useState(false);
+  const [currentTurn, setCurrentTurn] = useState('w'); // Track the current turn
 
   useEffect(() => {
     let timer;
-    if (isRunning && delay > 0) {
-      timer = setInterval(() => {
-        setDelay(delay - 1);
+    if (isRunning) {
+      timer = setInterval(async () => {
+        // Fetch the current turn from the server
+        const BASEURL = 'http://localhost:5757';
+        const turnResponse = await axios.get(`${BASEURL}/turn`);
+        if (turnResponse.data.code !== 200) {
+          console.error('Error getting turn:', turnResponse.data);
+          return false;
+        }
+        console.log(turnResponse.data.turn);
+
+       
+        setCurrentTurn(turnResponse.data);
+        currentTurn=turnResponse.data.turn;
+       
+
+        // Update the timer based on the current turn
+        if (currentTurn === 'w' && delayW > 0) {
+          setDelayW(delayW - 1);
+        } else if (currentTurn === 'b' && delayB > 0) {
+          setDelayB(delayB - 1);
+        }
+        if (delayW === 0 ) {
+          clearInterval(timer);
+          setIsRunning(false);
+          console.log('Timer has stopped because white time reached 0:00');
+          await axios.post(`${BASEURL}/concede/:w`)
+        }
+        if (delayB === 0 ) {
+          clearInterval(timer);
+          setIsRunning(false);
+          console.log('Timer has stopped because  black time reached 0:00');
+          await axios.post(`${BASEURL}/concede/:b`)
+        }
       }, 1000);
     }
 
     return () => {
       clearInterval(timer);
     };
-  }, [delay, isRunning]);
+  }, [delayW, delayB, isRunning, currentTurn])
 //delay for adding and subtracting minutes
   function add() {
-    setDelay(delay + 60);
-    if( delay>=600 && delay< 1000 ){
-      setDelay(delay + 9999999999999999999)
+    setDelayW(delayW + 60);
+    setDelayB(delayB + 60);
+
+    if( delayW>=600 && delayW< 1000 ){
+      setDelayW(delayW + 9999999999999999999)
+      setDelayB(delayB + 9999999999999999999)
+
     }
-   else if( delay>=1000 ){
-      setDelay(60)
+   else if( delayW>=1000 ){
+      setDelayW(60)
+      setDelayB(60)
+
     }
   }
 
   function minus() {
-    setDelay(delay - 60);
-    if( delay<=60){
-      setDelay(delay + 9999999999999999999)
+    setDelayW(delayW - 60);
+    setDelayB(delayB - 60);
+    if( delayW<=60){
+      setDelayW(delayW + 9999999999999999999)
+      setDelayB(delayB + 9999999999999999999)
     }
-   else if( delay>=1000 ){
-      setDelay(600)
+   else if( delayW>=1000 ){
+      setDelayW(600)
+      setDelayB(600)
     }
   }
 
@@ -97,12 +145,16 @@ const Time = () => {
 
   function resettime() {
     setIsRunning(false);
-    setDelay(180);
+    setDelayW(180);
+    setDelayB(180);
   }
 
-  const minutes = Math.floor(delay / 60);
-  const seconds = delay % 60;
+  const minutesW = Math.floor(delayW / 60);
+  const secondsW = delayW % 60;
+  const minutesB = Math.floor(delayB / 60);
+  const secondsB = delayB % 60;
 //display buttons and times
+
   return (
     <div>
       <div>
@@ -115,14 +167,14 @@ const Time = () => {
           <p>White Timer</p>
           <div style={{ height: '1px', width: '100%', backgroundColor: 'black' }} />
           <div>
-            <TimerW minutes={minutes} seconds={seconds} />
+            <TimerW minutes={minutesW} seconds={secondsW} />
           </div>
         </div>
         <div style={{ border: '1px solid black', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: 'white', padding: '0px' }}>
           <p>Black Timer</p>
           <div style={{ height: '1px', width: '100%', backgroundColor: 'black' }} />
           <div>
-            <TimerB minutes={minutes} seconds={seconds} />
+            <TimerB minutes={minutesB} seconds={secondsB} />
           </div>
         </div>
       </div>
