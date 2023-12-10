@@ -14,7 +14,7 @@ import {
   ServerToClientEvents,
   SocketData,
   ViewingArea as ViewingAreaModel,
-  GameArea as GameAreaModel
+  GameArea as GameAreaModel,
 } from '../types/CoveyTownSocket';
 import ConversationArea from './ConversationArea';
 import InteractableArea from './InteractableArea';
@@ -301,11 +301,9 @@ export default class Town {
    * fame area with the specified ID or if there is already an active game area
    * with the specified ID
    */
-  public addGameArea (gameArea: GameAreaModel): boolean {
-    const area = this._interactables.find(
-      eachArea => eachArea.id === gameArea.id,
-    ) as GameArea;
-    if (!area || !gameArea.chosenGame || !area.chosenGame) {
+  public addGameArea(gameArea: GameAreaModel): boolean {
+    const area = this._interactables.find(eachArea => eachArea.id === gameArea.id) as GameArea;
+    if (!area || !gameArea.chosenGame || area.chosenGame) {
       return false;
     }
     area.chosenGame = gameArea.chosenGame;
@@ -313,7 +311,6 @@ export default class Town {
     this._broadcastEmitter.emit('interactableUpdate', area.toModel());
     return true;
   }
-
 
   /**
    * Fetch a player's session based on the provided session token. Returns undefined if the
@@ -386,11 +383,12 @@ export default class Town {
 
     const gameAreas = objectLayer.objects
       .filter(eachObject => eachObject.type === 'GameArea')
-      .map(eachGameAreaObj =>
-        GameArea.fromMapObject(eachGameAreaObj, this._broadcastEmitter),
-      );
+      .map(eachGameAreaObj => GameArea.fromMapObject(eachGameAreaObj, this._broadcastEmitter));
 
-    this._interactables = this._interactables.concat(viewingAreas).concat(conversationAreas).concat(gameAreas);
+    this._interactables = this._interactables
+      .concat(viewingAreas)
+      .concat(conversationAreas)
+      .concat(gameAreas);
     this._validateInteractables();
   }
 

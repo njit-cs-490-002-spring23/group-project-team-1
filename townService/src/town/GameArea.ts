@@ -4,9 +4,6 @@ import { BoundingBox, GameArea as GameAreaModel, TownEmitter } from '../types/Co
 import InteractableArea from './InteractableArea';
 
 export default class GameArea extends InteractableArea {
-  /* The game ID of the current chess game of the chess area, or undefined if no game is in progress */
-  public gameID?: string;
-
   /* The type of game being played. The default is chess. */
   public chosenGame?: string;
 
@@ -18,12 +15,17 @@ export default class GameArea extends InteractableArea {
   /**
    * Creates a new ChessArea
    *
-   * @param id the ID if the current chess area
+   * @param gameAreaModel the ID if the current chess area
    * @param coordinates the bounding box that defines this chess area
    * @param townEmitter a broadcast emitter that can be used to emit updates to players
    */
-  public constructor({ id }: GameAreaModel, coordinates: BoundingBox, townEmitter: TownEmitter) {
+  public constructor(
+    { chosenGame, id }: GameAreaModel,
+    coordinates: BoundingBox,
+    townEmitter: TownEmitter,
+  ) {
     super(id, coordinates, townEmitter);
+    this.chosenGame = chosenGame;
   }
 
   /**
@@ -37,7 +39,6 @@ export default class GameArea extends InteractableArea {
   public remove(player: Player) {
     super.remove(player);
     if (this._occupants.length === 0) {
-      this.gameID = undefined;
       this.chosenGame = undefined;
       this._emitAreaChanged();
     }
@@ -51,11 +52,9 @@ export default class GameArea extends InteractableArea {
     return {
       id: this.id,
       occupantsByID: this.occupantsByID,
-      gameID: this.gameID,
       chosenGame: this.chosenGame,
     };
   }
-
 
   /**
    * Creates a new ChessArea object that will represent a Chess Area object in the town map.

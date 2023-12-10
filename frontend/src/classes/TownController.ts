@@ -16,11 +16,11 @@ import {
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
 } from '../types/CoveyTownSocket';
-import { isConversationArea, isViewingArea, isGameArea } from '../types/TypeUtils';
+import { isConversationArea, isGameArea, isViewingArea } from '../types/TypeUtils';
 import ConversationAreaController from './ConversationAreaController';
+import GameAreaController from './GameAreaController';
 import PlayerController from './PlayerController';
 import ViewingAreaController from './ViewingAreaController';
-import GameAreaController from './GameAreaController';
 
 const CALCULATE_NEARBY_PLAYERS_DELAY = 300;
 
@@ -443,6 +443,17 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             this.emit('conversationAreasChanged', this._conversationAreasInternal);
           }
         }
+      } else if (isGameArea(interactable)) {
+        const updatedGameArea = this.gameAreas.find(c => c.id === interactable.id);
+        if (updatedGameArea) {
+          const emptyNow = updatedGameArea.isEmpty();
+          updatedGameArea.chosenGame = interactable.chosenGame;
+          updatedGameArea.occupants = this._playersByIDs(interactable.occupantsByID);
+          const emptyAfterChange = updatedGameArea.isEmpty();
+          if (emptyNow !== emptyAfterChange) {
+            this.emit('gameAreasChanged', this._gameAreasInternal);
+          }
+        }
       } else if (isViewingArea(interactable)) {
         const updatedViewingArea = this._viewingAreas.find(
           eachArea => eachArea.id === interactable.id,
@@ -525,11 +536,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    *
    * @param newArea
    */
-  async createGameArea(newArea: {
-    id: string,
-    gameID?: string;
-    occupantsByID: Array<string>;
-  }) {
+  async createGameArea(newArea: { chosenGame?: string; id: string; occupantsByID: Array<string> }) {
     await this._townsService.createGameArea(this.townID, this.sessionToken, newArea);
   }
 
@@ -576,6 +583,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
         this._conversationAreas = [];
         this._viewingAreas = [];
+        this._gameAreas = [];
         initialData.interactables.forEach(eachInteractable => {
           if (isConversationArea(eachInteractable)) {
             this._conversationAreasInternal.push(
@@ -586,6 +594,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             );
           } else if (isViewingArea(eachInteractable)) {
             this._viewingAreas.push(new ViewingAreaController(eachInteractable));
+          } else if (isGameArea(eachInteractable)) {
+            this._gameAreasInternal.push(
+              GameAreaController.fromGameAreaModel(eachInteractable, this._playersByIDs.bind(this)),
+            );
           }
         });
         this._userID = initialData.userID;

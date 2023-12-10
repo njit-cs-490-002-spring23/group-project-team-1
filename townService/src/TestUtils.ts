@@ -15,6 +15,7 @@ import {
   BoundingBox,
   ClientToServerEvents,
   ConversationArea,
+  GameArea,
   CoveyTownSocket,
   Direction,
   Interactable,
@@ -38,6 +39,18 @@ export function createConversationForTesting(params?: {
     id: params?.conversationID || nanoid(),
     occupantsByID: [],
     topic: params?.conversationTopic || nanoid(),
+  };
+}
+
+export function createGameForTesting(params?: {
+  gameID?: string;
+  gameChosenGame?: string;
+  boundingBox?: BoundingBox;
+}): ConversationArea {
+  return {
+    id: params?.gameID || nanoid(),
+    occupantsByID: [],
+    topic: params?.gameChosenGame || nanoid(),
   };
 }
 
@@ -201,4 +214,8 @@ export function isViewingArea(interactable: Interactable): interactable is Viewi
 
 export function isConversationArea(interactable: Interactable): interactable is ConversationArea {
   return 'topic' in interactable;
+}
+
+export function isGameArea(interactable: Interactable): interactable is GameArea {
+  return 'chosenGame' in interactable;
 }

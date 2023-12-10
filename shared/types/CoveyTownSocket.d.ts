@@ -72,7 +72,6 @@ export interface ViewingArea {
 
 export interface GameArea {
   id: string;
-  gameID?: string;
   chosenGame?: string;
   occupantsByID: string[];
 }

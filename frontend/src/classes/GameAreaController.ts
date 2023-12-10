@@ -97,14 +97,13 @@ export default class GameAreaController extends (EventEmitter as new () => Typed
     return {
       id: this.id,
       occupantsByID: this.occupants.map(player => player.id),
-      gameID: this._gameID,
-      chosenGame: this._chosenGame
+      chosenGame: this._chosenGame,
     };
   }
 
   /**
    * Create a new ConversationAreaController to match a given ConversationAreaModel
-   * @param convAreaModel Conversation area to represent
+   * @param gameAreaModel Conversation area to represent
    * @param playerFinder A function that will return a list of PlayerController's
    *                     matching a list of Player ID's
    */
@@ -123,7 +122,7 @@ export default class GameAreaController extends (EventEmitter as new () => Typed
  *
  * This hook will re-render any components that use it when the set of occupants changes.
  */
-export function useConversationAreaOccupants(area: GameAreaController): PlayerController[] {
+export function useGameAreaOccupants(area: GameAreaController): PlayerController[] {
   const [occupants, setOccupants] = useState(area.occupants);
   useEffect(() => {
     area.addListener('occupantsChange', setOccupants);
@@ -140,7 +139,7 @@ export function useConversationAreaOccupants(area: GameAreaController): PlayerCo
  *
  * This hook will re-render any components that use it when the topic changes.
  */
-export function useGameAreaTopic(area: GameAreaController): string {
+export function useGameAreaGame(area: GameAreaController): string {
   const [chosenGame, setGame] = useState(area.chosenGame);
   useEffect(() => {
     area.addListener('gameChange', setGame);

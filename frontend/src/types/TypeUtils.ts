@@ -1,4 +1,4 @@
-import { ConversationArea, Interactable, ViewingArea, GameArea } from './CoveyTownSocket';
+import { ConversationArea, GameArea, Interactable, ViewingArea } from './CoveyTownSocket';
 
 /**
  * Test to see if an interactable is a conversation area
@@ -15,5 +15,5 @@ export function isViewingArea(interactable: Interactable): interactable is Viewi
 }
 
 export function isGameArea(interactable: Interactable): interactable is GameArea {
-  return 'playersByID' in interactable;
+  return 'chosenGame' in interactable;
 }

@@ -22,7 +22,7 @@ import {
   CoveyTownSocket,
   TownSettingsUpdate,
   ViewingArea,
-  GameArea
+  GameArea,
 } from '../types/CoveyTownSocket';
 
 /**

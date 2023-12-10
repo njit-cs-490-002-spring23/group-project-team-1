@@ -21,10 +21,10 @@ export default class GameArea extends Interactable {
     this._townController.addListener('gameAreasChanged', this._updateGameAreas);
   }
 
-  private get _chosenGameText() {
+  private get _topicText() {
     const ret = this._topicTextOrUndefined;
     if (!ret) {
-      throw new Error('Expected chosen game text to be defined');
+      throw new Error('Expected game text to be defined');
     }
     return ret;
   }
@@ -46,7 +46,7 @@ export default class GameArea extends Interactable {
     this._topicTextOrUndefined = this.scene.add.text(
       this.x - this.displayWidth / 2,
       this.y + this.displayHeight / 2,
-      '(No Game Chosen)',
+      '(No Game)',
       { color: '#000000' },
     );
     this._updateGameAreas(this._townController.gameAreas);
@@ -57,7 +57,7 @@ export default class GameArea extends Interactable {
     if (area !== this._gameArea) {
       if (area === undefined) {
         this._gameArea = undefined;
-        this._chosenGameText.text = '(No Game Chosen)';
+        this._topicText.text = '(No game)';
       } else {
         this._gameArea = area;
         if (this.isOverlapping) {
@@ -68,9 +68,9 @@ export default class GameArea extends Interactable {
             if (this._infoTextBox && this._infoTextBox.visible) {
               this._infoTextBox.setVisible(false);
             }
-            this._chosenGameText.text = newChosenGame;
+            this._topicText.text = newChosenGame;
           } else {
-            this._chosenGameText.text = '(No game)';
+            this._topicText.text = '(No game)';
           }
         };
         updateListener(area.chosenGame);
@@ -90,7 +90,7 @@ export default class GameArea extends Interactable {
         .text(
           this.scene.scale.width / 2,
           this.scene.scale.height / 2,
-          "You've found an empty conversation area!\nTell others what you'd like to talk about here\nby providing a topic label for the conversation.\nSpecify a topic by pressing the spacebar.",
+          "You've found an empty game area!\nSelect the game you would like to play by pressing the spacebar.",
           { color: '#000000', backgroundColor: '#FFFFFF' },
         )
         .setScrollFactor(0)

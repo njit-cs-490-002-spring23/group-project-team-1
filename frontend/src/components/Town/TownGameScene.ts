@@ -3,13 +3,12 @@ import Phaser from 'phaser';
 import PlayerController from '../../classes/PlayerController';
 import TownController from '../../classes/TownController';
 import { PlayerLocation } from '../../types/CoveyTownSocket';
-import { isGameArea } from '../../types/TypeUtils';
 import { Callback } from '../VideoCall/VideoFrontend/types';
 import Interactable from './Interactable';
 import ConversationArea from './interactables/ConversationArea';
+import GameArea from './interactables/GameArea';
 import Transporter from './interactables/Transporter';
 import ViewingArea from './interactables/ViewingArea';
-import GameArea from './interactables/GameArea';
 
 // Still not sure what the right type is here... "Interactable" doesn't do it
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,8 +21,7 @@ function interactableTypeForObjectType(type: string): any {
     return ViewingArea;
   } else if (type == 'GameArea') {
     return GameArea;
-  }
-  else {
+  } else {
     throw new Error(`Unknown object type: ${type}`);
   }
 }

@@ -2,6 +2,7 @@ import { ReservedOrUserListener } from '@socket.io/component-emitter';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import ConversationAreaController from './classes/ConversationAreaController';
+import GameAreaController from './classes/GameAreaController';
 import PlayerController from './classes/PlayerController';
 import TownController, { TownEvents } from './classes/TownController';
 import ViewingAreaController from './classes/ViewingAreaController';
@@ -84,6 +85,7 @@ type MockedTownControllerProperties = {
   townIsPubliclyListed?: boolean;
   players?: PlayerController[];
   conversationAreas?: ConversationAreaController[];
+  gameAreas?: GameAreaController[];
   viewingAreas?: ViewingAreaController[];
 };
 export function mockTownController({
@@ -94,6 +96,7 @@ export function mockTownController({
   townIsPubliclyListed,
   players,
   conversationAreas,
+  gameAreas,
   viewingAreas,
 }: MockedTownControllerProperties) {
   const mockedController = mock<TownController>();
@@ -119,6 +122,9 @@ export function mockTownController({
   }
   if (conversationAreas) {
     Object.defineProperty(mockedController, 'conversationAreas', { value: conversationAreas });
+  }
+  if (gameAreas) {
+    Object.defineProperty(mockedController, 'gameAreas', { value: gameAreas });
   }
   if (viewingAreas) {
     Object.defineProperty(mockedController, 'viewingAreas', { value: viewingAreas });
@@ -165,6 +171,11 @@ export async function mockTownControllerConnection(
       topic: undefined,
       occupantsByID: [],
     });
+    responseToSendController.interactables.push({
+      id: nanoid(),
+      chosenGame: undefined,
+      occupantsByID: [],
+    });
     for (let i = 0; i < 10; i++) {
       const playerID = nanoid();
       responseToSendController.currentPlayers.push({
@@ -175,6 +186,11 @@ export async function mockTownControllerConnection(
       responseToSendController.interactables.push({
         id: nanoid(),
         topic: nanoid(),
+        occupantsByID: [playerID],
+      });
+      responseToSendController.interactables.push({
+        id: nanoid(),
+        chosenGame: nanoid(),
         occupantsByID: [playerID],
       });
       responseToSendController.interactables.push({
