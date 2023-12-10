@@ -12,7 +12,7 @@ import { useInteractable } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
 import Time from './time'; //
 import { Chessboard } from 'react-chessboard'; //https://medium.com/@ryangregorydev/creating-a-chessboard-app-in-react-3fd9e2b2f6a6
-import {Chess} from 'chess.js';
+import {Chess, validateFen} from 'chess.js';
 import axios from 'axios';
 export default function NewConversationModal(): Promise<JSX.Element> {
  
@@ -27,7 +27,7 @@ const STOCKFISHFLAG: boolean = false;
   const [showTimer, setShowTimer] = useState(false);
   const [showChess, setShowChess] = useState(false);
   const [currentleaderboard, setLeaderboard] = useState({});
- // const [currentFen, setFen] = useState({});
+  // const [currentFen, setFen] = useState({});
   let chess = new Chess(); // <- 1
   const [fen, setFen] = useState("start"); // <- 2
   const [over, setOver] = useState('Not Over');
@@ -269,6 +269,10 @@ useEffect(() => {
   const handleSubmit = async (event: any) => {
     event.preventDefault();
 
+    console.log(validateFen(inputFen).ok);
+    if (!validateFen(inputFen).ok)
+      return;
+
     await axios
     // eslint-disable-next-line object-shorthand
     .post(`${BASEURL}/load`,  { fen: inputFen } )
@@ -309,7 +313,7 @@ useEffect(() => {
     <Button onClick={() => setShowChess(!showChess)}>start chess</Button>
     <Chessboard position={fen} onPieceDrop={onDrop} autoPromoteToQueen={true}/>
       <form onSubmit={handleSubmit}>
-      <input type='text' value={inputFen} onChange={(e) => setInputFen(e.target.value)}/>
+      <input type='text' placeholder='Enter FEN String' value={inputFen} onChange={(e) => setInputFen(e.target.value)}/>
       </form>
       </ModalContent>
     </Modal>
