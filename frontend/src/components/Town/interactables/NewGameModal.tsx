@@ -2,7 +2,6 @@ import {
   Button,
   FormControl,
   FormLabel,
-  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -17,6 +16,11 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useInteractable } from '../../../classes/TownController';
 import { GameArea } from '../../../generated/client';
 import useTownController from '../../../hooks/useTownController';
+//import Time from './time';
+//import { Chessboard } from 'react-chessboard'; //https://medium.com/@ryangregorydev/creating-a-chessboard-app-in-react-3fd9e2b2f6a6
+// eslint-disable-next-line import/no-extraneous-dependencies
+//import { Chess, validateFen } from 'chess.js';
+//import axios from 'axios';
 
 export default function NewGameModal(): JSX.Element {
   const coveyTownController = useTownController();
@@ -55,9 +59,28 @@ export default function NewGameModal(): JSX.Element {
           status: 'success',
         });
         setChosenGame('');
-        
-        coveyTownController.unPause();
         closeModal();
+        coveyTownController.pause();
+        console.log(coveyTownController.paused);
+        return (
+          <Modal
+            isOpen={isOpen}
+            onClose={() => {
+              closeModal();
+              coveyTownController.unPause();
+            }}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Welcome to Chess, {coveyTownController.ourPlayer.id}!</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <Button size='md'>Leave</Button>
+                <Button size='sm'>Play Against an AI</Button>
+                <Button size='sm'>Wait Another Player</Button>
+              </ModalBody>
+            </ModalContent>
+          </Modal>
+        );
       } catch (err) {
         if (err instanceof Error) {
           toast({
@@ -90,12 +113,13 @@ export default function NewGameModal(): JSX.Element {
         <form
           onSubmit={ev => {
             ev.preventDefault();
+            console.log("This one was called.");
             createGame();
           }}>
           <ModalBody pb={6}>
             <FormControl>
               <FormLabel htmlFor='game'>Choose a Game to Play</FormLabel>
-              <Select 
+              <Select
                 placeholder='Choose game...'
                 id='game'
                 name='game'
