@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import useTownController from '../../hooks/useTownController';
 import SocialSidebar from '../SocialSidebar/SocialSidebar';
 import NewConversationModal from './interactables/NewCoversationModal';
+import NewGameModal from './interactables/NewGameModal';
 import TownGameScene from './TownGameScene';
 
 export default function TownMap(): JSX.Element {
@@ -48,6 +49,7 @@ export default function TownMap(): JSX.Element {
   return (
     <div id='app-container'>
       <NewConversationModal />
+      <NewGameModal />
       <div id='map-container' />
       <div id='social-container'>
         <SocialSidebar />
