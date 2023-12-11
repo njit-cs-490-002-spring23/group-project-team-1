@@ -23,7 +23,7 @@ router.route('/concede/:color').post(ChessHandler.concede);
 router.route('/winner').get(ChessHandler.winner);
 
 router.route('/stockfishinit/:elo').post(StockfishHandler.initialize);
-router.route('/stockfishmove').get(StockfishHandler.getBestMove);
+router.route('/stockfishmove').post(StockfishHandler.getBestMove);
 router.route('/stockfishlist').get(StockfishHandler.getBestMoveList);
 
 export default router;

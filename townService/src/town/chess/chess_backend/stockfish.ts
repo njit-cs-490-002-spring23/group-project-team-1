@@ -138,18 +138,19 @@ await stockypoo.getBestMovesList('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w 
 
 console.log(stockypoo.getMoveList());
 
-const game = new ChessGame(12, 21);
-game.loadFen('rnbqkbnr/ppppp2p/8/5Pp1/8/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2');
-await stockypoo.callStockfish(game.getFen());
-await stockypoo.getBestMovesList(game.getFen());
-console.log(stockypoo.getMoveList());
-console.log(stockypoo.getMove());
-console.log(game.getMoves());
-console.log(game.matchMoves(stockypoo.getMove()));
-game.make_move(game.matchMoves(stockypoo.getMove()), Colors.White);
-console.log(game.getFen());
-console.log(game.getReasonForGameEnd());
-console.log(game.checkIfCheckmate());
+// const game = new ChessGame(12, 21);
+// game.loadFen('rnbqkbnr/ppppp2p/8/5Pp1/8/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2');
+// await stockypoo.callStockfish(game.getFen());
+// await stockypoo.getBestMovesList(game.getFen());
+// console.log(stockypoo.getMoveList());
+// console.log(stockypoo.getMove());
+// console.log(game.getMoves());
+// console.log(game.matchMoves(stockypoo.getMove()));
+// game.make_move(game.matchMoves(stockypoo.getMove()), Colors.White);
+// console.log(game.getFen());
+// console.log(game.getReasonForGameEnd());
+// console.log(game.checkIfCheckmate());
+
 // let move = game.matchMoves(stockypoo.getMove().slice(2, 3));
 // console.log(game.getMoves());
 // console.log(game.make_move(move, Colors.White));
