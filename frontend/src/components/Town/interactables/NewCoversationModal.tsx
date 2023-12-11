@@ -19,6 +19,19 @@ export default function NewConversationModal(): Promise<JSX.Element> {
   const baseURL = 'http://localhost:5757';
   const stockfishFlag = false;
 
+  async function getBaseFen() {
+    let newFen: string;
+    newFen = '';
+    await axios
+      // eslint-disable-next-line object-shorthand
+      .get(`${baseURL}/fen`)
+      .then(response => response.data)
+      // eslint-disable-next-line no-return-assign
+      .then(data => newFen = data.fen)
+      .catch(e => console.log(e));
+      console.log(`new fen (getBaseFen): ${newFen}`);
+  }
+
   // const currentleaderboard: { [username: string]: any } = leaderboardElo;
   const coveyTownController = useTownController();
   const newConversation = useInteractable('conversationArea');
@@ -38,10 +51,38 @@ export default function NewConversationModal(): Promise<JSX.Element> {
       method: 'POST',
     })
       .then(res => res.json())
+      .then(data => console.log(data))
       .catch(error => {
         console.error('Error initializing game:', error);
       });
   }, []);
+
+  useEffect(() => {
+    let newFen: string;
+    newFen = '';
+
+    let timer;
+    timer = setInterval(async () => {
+      fetch(`${baseURL}/fen`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.fen !== fen)
+          setFen(data.fen);
+        console.log(data.fen);
+      })
+      .catch(error => {
+        console.error('Error fen:', error);
+      });
+
+      if (over === 'Not Over') {
+        const isOver = (await axios.get(`${baseURL}/reason`)).data;
+        setOver(isOver.reason);
+        console.log(`Over: ${over}`);
+      }
+
+    }, 1000);
+
+  }, [fen]);
 
   function matchMove(
     piece: string,
@@ -213,9 +254,9 @@ export default function NewConversationModal(): Promise<JSX.Element> {
       await stockfishMove(newFen.data.fen);
     }
 
-    const isOver = (await axios.get(`${baseURL}/reason`)).data;
-    setOver(isOver.reason);
-    console.log(`Over: ${over}`);
+    // const isOver = (await axios.get(`${baseURL}/reason`)).data;
+    // setOver(isOver.reason);
+    // console.log(`Over: ${over}`);
 
     return true;
   }
@@ -320,6 +361,7 @@ export default function NewConversationModal(): Promise<JSX.Element> {
             onChange={e => setInputFen(e.target.value)}
           />
         </form>
+        {over === 'Not Over' ? '' : over}
       </ModalContent>
     </Modal>
   );
