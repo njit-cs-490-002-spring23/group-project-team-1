@@ -3,32 +3,49 @@ import {
   Modal,
   ModalCloseButton,
   ModalContent,
-  ModalFooter,
   ModalHeader,
   ModalOverlay,
 } from '@chakra-ui/react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import ReactSlider from 'react-slider'
 import { useInteractable } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
-import Time from './time'; //
+import Time from './time';
 import { Chessboard } from 'react-chessboard'; //https://medium.com/@ryangregorydev/creating-a-chessboard-app-in-react-3fd9e2b2f6a6
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Chess, validateFen } from 'chess.js';
 import axios from 'axios';
 export default function NewConversationModal(): Promise<JSX.Element> {
   const baseURL = 'http://localhost:5757';
-  const stockfishFlag = false;
+  const [sliderValue, setSliderValue] = useState(300); // Initialize with the minimum value
 
+const handleSliderChange = (value: React.SetStateAction<number>) => {
+  setSliderValue(value);
+};
+  const saveSliderValue = () => {
+    // Assuming you have a state variable to hold the slider value
+    console.log('Saving slider value:', sliderValue);
+    // Implement the logic to save the slider value
+    setstockfishFlag(true);
+    
+  };
+  const disableStock = () => {
+    // Assuming you have a state variable to hold the slider value
+    console.log('stockfish is off');
+    // Implement the logic to save the slider value
+    setstockfishFlag(false);
+    
+  };
   // const currentleaderboard: { [username: string]: any } = leaderboardElo;
   const coveyTownController = useTownController();
   const newConversation = useInteractable('conversationArea');
-  const [topic, setTopic] = useState<string>('');
   const [showTimer, setShowTimer] = useState(false);
   const [showChess, setShowChess] = useState(false);
   const [currentleaderboard, setLeaderboard] = useState({});
   // const [currentFen, setFen] = useState({});
   const chess = new Chess(); // <- 1
   const [fen, setFen] = useState('start'); // <- 2
+  const [stockfishFlag, setstockfishFlag] = useState(false); // <- 2
   const [over, setOver] = useState('Not Over');
   const [inputFen, setInputFen] = useState('');
   let turn;
@@ -105,7 +122,7 @@ export default function NewConversationModal(): Promise<JSX.Element> {
   }
 
   async function stockfishMove(currfen: string) {
-    const initResponse = (await axios.post(`${baseURL}/stockfishinit/3000`)).data;
+    const initResponse = (await axios.post(`${baseURL}/stockfishinit/${sliderValue}`)).data;
     if (initResponse.status !== 200) console.log('Error!');
 
     console.log(`Init Response (83): ${initResponse}`);
@@ -310,8 +327,49 @@ export default function NewConversationModal(): Promise<JSX.Element> {
         </table>
         <Button onClick={() => setShowTimer(!showTimer)}>Toggle Timer</Button>
         {showTimer && <Time />}
+        <div style={{ margin: '20px 0', display: 'flex', justifyContent: 'center' }}>
+          <table>
+            <tr style={{ textAlign: 'center' }}><th>
+    <Button onClick={saveSliderValue} style={{ display: 'block', marginTop: '10px' }}>
+      Start A.I. game
+    </Button>
+    </th><th>
+    <Button onClick={disableStock} style={{ display: 'block', marginTop: '10px' }}>
+      Start human game
+    </Button>
+    </th></tr>
+            <tr style={{ textAlign: 'center' }}>
+            <th> <p>Set A.I. Elo</p> </th>
+            <th>
+    <ReactSlider
+      className="horizontal-slider"
+      marks
+      markClassName="example-mark"
+      min={300}
+      max={3000}
+      step={50}
+      thumbClassName="example-thumb"
+      trackClassName="example-track"
+      value={sliderValue}
+      onChange={handleSliderChange}
+      renderThumb={(props, state) => (
+        <div {...props} style={{ ...props.style, height: '12px', width: '12px', backgroundColor: '#000', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+          <div style={{ position: 'absolute', bottom: '-25px', left: '50%', transform: 'translateX(-50%)', color: 'black', fontSize: '12px' }}>
+            {state.valueNow}
+          </div>
+        </div>
+      )}     renderTrack={(props, state) => (
+        <div {...props} style={{ ...props.style, backgroundColor: 'red', height: '10px' }} />
+      )}    />
+    </th>
+    </tr>
+  
+    </table>
+  </div>
         <Button onClick={() => setShowChess(!showChess)}>start chess</Button>
         <Chessboard position={fen} onPieceDrop={onDrop} autoPromoteToQueen={true} />
+        
+<div>
         <form onSubmit={handleSubmit}>
           <input
             type='text'
@@ -320,6 +378,7 @@ export default function NewConversationModal(): Promise<JSX.Element> {
             onChange={e => setInputFen(e.target.value)}
           />
         </form>
+        </div>
       </ModalContent>
     </Modal>
   );
