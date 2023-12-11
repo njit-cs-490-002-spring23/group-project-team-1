@@ -1,13 +1,9 @@
-/**
- * TO DO:
- * Make timer count down
- */
-
 import { Chess, SQUARES, Square } from 'chess.js';
 
 /**
  * Colors for referencing pieces or player. Use this, it is directly related to the backend functionality.
  */
+
 export enum Colors {
   White = 'w',
   Black = 'b',
@@ -130,6 +126,10 @@ class ChessGame {
     const pieceArr = ['r', 'R', 'q', 'Q', 'n', 'N', 'b', 'B', 'k', 'K'];
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     if (moveToMake === 'O-O' || moveToMake === 'O-O-O') {
+      return moveToMake;
+    }
+    if (moves.includes(moveToMake)) {
+      console.log(`list includes ${moveToMake}`);
       return moveToMake;
     }
     if (moveToMake.length === 2) {
