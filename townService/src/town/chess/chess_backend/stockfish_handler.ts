@@ -11,8 +11,11 @@ export default class StockfishHandler {
    */
   static async initialize(req, res) {
     const { elo } = req.params;
+    console.log('in init');
+    console.log(elo);
     let response;
     Stockfish = new CallStockfish(elo);
+    console.log('init');
     if (Stockfish) response = { status: 200, message: 'Stockfish Initialized', stockfish_elo: elo };
     else response = { status: 400, message: 'Failed' };
 
@@ -25,8 +28,12 @@ export default class StockfishHandler {
    * @param res JSON containing stockfish move, use .move
    */
   static async getBestMove(req, res) {
-    const { fen } = req.body;
+    console.log('Stockfish Here');
+    const { fen } = req.body.data;
+    console.log(req.body);
+    console.log(fen);
     await Stockfish.callStockfish(fen);
+    console.log(`StockFish Get Move ${Stockfish.getMove()}`);
     const response = { move: Stockfish.getMove() };
     res.json(response);
   }
