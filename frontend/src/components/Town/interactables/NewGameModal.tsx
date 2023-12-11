@@ -95,7 +95,7 @@ export default function NewGameModal(): JSX.Element {
               <FormLabel htmlFor='topic'>Topic of Conversation</FormLabel>
               <Input
                 id='topic'
-                placeholder='Share the topic of your conversation'
+                placeholder='Choose the game you want to play'
                 name='game'
                 value={chosenGame}
                 onChange={e => setChosenGame(e.target.value)}

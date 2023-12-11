@@ -10,7 +10,7 @@ import PlayerController from './PlayerController';
  * are only ever emitted to local components (not to the townService).
  */
 export type GameAreaEvents = {
-  gameChange: (newTopic: string | undefined) => void;
+  gameChange: (newChosenGame: string | undefined) => void;
   occupantsChange: (newOccupants: PlayerController[]) => void;
 };
 
@@ -25,8 +25,6 @@ export default class GameAreaController extends (EventEmitter as new () => Typed
   private _occupants: PlayerController[] = [];
 
   private _id: string;
-
-  private _gameID?: string;
 
   private _chosenGame?: string;
 
@@ -71,11 +69,11 @@ export default class GameAreaController extends (EventEmitter as new () => Typed
    *
    * Setting the topic to the value `undefined` will indicate that the conversation area is not active
    */
-  set chosenGame(newGame: string | undefined) {
-    if (this._chosenGame !== newGame) {
-      this.emit('gameChange', newGame);
+  set chosenGame(newChosenGame: string | undefined) {
+    if (this._chosenGame !== newChosenGame) {
+      this.emit('gameChange', newChosenGame);
     }
-    this._chosenGame = newGame;
+    this._chosenGame = newChosenGame;
   }
 
   get chosenGame(): string | undefined {
@@ -97,7 +95,7 @@ export default class GameAreaController extends (EventEmitter as new () => Typed
     return {
       id: this.id,
       occupantsByID: this.occupants.map(player => player.id),
-      chosenGame: this._chosenGame,
+      chosenGame: this.chosenGame,
     };
   }
 
@@ -139,12 +137,12 @@ export function useGameAreaOccupants(area: GameAreaController): PlayerController
  *
  * This hook will re-render any components that use it when the topic changes.
  */
-export function useGameAreaGame(area: GameAreaController): string {
-  const [chosenGame, setGame] = useState(area.chosenGame);
+export function useGameAreaChosenGame(area: GameAreaController): string {
+  const [chosenGame, setChosenGame] = useState(area.chosenGame);
   useEffect(() => {
-    area.addListener('gameChange', setGame);
+    area.addListener('gameChange', setChosenGame);
     return () => {
-      area.removeListener('gameChange', setGame);
+      area.removeListener('gameChange', setChosenGame);
     };
   }, [area]);
   return chosenGame || NO_TOPIC_STRING;
