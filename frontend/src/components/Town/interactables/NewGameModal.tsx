@@ -10,6 +10,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Select,
   useToast,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -54,6 +55,7 @@ export default function NewGameModal(): JSX.Element {
           status: 'success',
         });
         setChosenGame('');
+        
         coveyTownController.unPause();
         closeModal();
       } catch (err) {
@@ -92,14 +94,15 @@ export default function NewGameModal(): JSX.Element {
           }}>
           <ModalBody pb={6}>
             <FormControl>
-              <FormLabel htmlFor='topic'>Choose Game</FormLabel>
-              <Input
-                id='topic'
-                placeholder='Choose the game you want to play'
+              <FormLabel htmlFor='game'>Choose a Game to Play</FormLabel>
+              <Select 
+                placeholder='Choose game...'
+                id='game'
                 name='game'
                 value={chosenGame}
-                onChange={e => setChosenGame(e.target.value)}
-              />
+                onChange={e => setChosenGame(e.target.value)}>
+                <option>Chess</option>
+              </Select>
             </FormControl>
           </ModalBody>
           <ModalFooter>
