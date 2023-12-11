@@ -46,11 +46,11 @@ export function createGameForTesting(params?: {
   gameID?: string;
   gameChosenGame?: string;
   boundingBox?: BoundingBox;
-}): ConversationArea {
+}): GameArea {
   return {
     id: params?.gameID || nanoid(),
     occupantsByID: [],
-    topic: params?.gameChosenGame || nanoid(),
+    chosenGame: params?.gameChosenGame || nanoid(),
   };
 }
 
