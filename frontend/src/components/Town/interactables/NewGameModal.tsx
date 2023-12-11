@@ -92,7 +92,7 @@ export default function NewGameModal(): JSX.Element {
           }}>
           <ModalBody pb={6}>
             <FormControl>
-              <FormLabel htmlFor='topic'>Topic of Conversation</FormLabel>
+              <FormLabel htmlFor='topic'>Choose Game</FormLabel>
               <Input
                 id='topic'
                 placeholder='Choose the game you want to play'
