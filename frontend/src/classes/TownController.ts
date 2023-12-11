@@ -16,8 +16,9 @@ import {
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
 } from '../types/CoveyTownSocket';
-import { isConversationArea, isViewingArea } from '../types/TypeUtils';
+import { isConversationArea, isGameArea, isViewingArea } from '../types/TypeUtils';
 import ConversationAreaController from './ConversationAreaController';
+import GameAreaController from './GameAreaController';
 import PlayerController from './PlayerController';
 import ViewingAreaController from './ViewingAreaController';
 
@@ -69,6 +70,11 @@ export type TownEvents = {
    * the town controller's record of viewing areas.
    */
   viewingAreasChanged: (newViewingAreas: ViewingAreaController[]) => void;
+  /**
+   * An event that indicates that the set of viewing areas has changed. This event is emitted after updating
+   * the town controller's record of viewing areas.
+   */
+  gameAreasChanged: (currentGameAreas: GameAreaController[]) => void;
   /**
    * An event that indicates that a new chat message has been received, which is the parameter passed to the listener
    */
@@ -127,10 +133,16 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   private _playersInternal: PlayerController[] = [];
 
   /**
-   * The current list of conversation areas in the twon. Adding or removing conversation areas might
+   * The current list of conversation areas in the town. Adding or removing conversation areas might
    * replace the array with a new one; clients should take note not to retain stale references.
    */
   private _conversationAreasInternal: ConversationAreaController[] = [];
+
+  /**
+   * The current list of game areas in the town. Adding or removing game areas might
+   * replace the array with a new one; clients should take note not to retain stale references.
+   */
+  private _gameAreasInternal: GameAreaController[] = [];
 
   /**
    * The friendly name of the current town, set only once this TownController is connected to the townsService
@@ -296,6 +308,15 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     this.emit('conversationAreasChanged', newConversationAreas);
   }
 
+  public get gameAreas() {
+    return this._gameAreasInternal;
+  }
+
+  private set _gameAreas(newGameAreas: GameAreaController[]) {
+    this._gameAreasInternal = newGameAreas;
+    this.emit('gameAreasChanged', newGameAreas);
+  }
+
   public get interactableEmitter() {
     return this._interactableEmitter;
   }
@@ -422,6 +443,17 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             this.emit('conversationAreasChanged', this._conversationAreasInternal);
           }
         }
+      } else if (isGameArea(interactable)) {
+        const updatedGameArea = this.gameAreas.find(c => c.id === interactable.id);
+        if (updatedGameArea) {
+          const emptyNow = updatedGameArea.isEmpty();
+          updatedGameArea.chosenGame = interactable.chosenGame;
+          updatedGameArea.occupants = this._playersByIDs(interactable.occupantsByID);
+          const emptyAfterChange = updatedGameArea.isEmpty();
+          if (emptyNow !== emptyAfterChange) {
+            this.emit('gameAreasChanged', this._gameAreasInternal);
+          }
+        }
       } else if (isViewingArea(interactable)) {
         const updatedViewingArea = this._viewingAreas.find(
           eachArea => eachArea.id === interactable.id,
@@ -498,6 +530,17 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
+   * Create a new game area, sending the request to the townService. Throws an error if the request
+   * is not successful. Does not immediately update local state about the new game area - it will be
+   * updated once the townService creates the area and emits an interactableUpdate
+   *
+   * @param newArea
+   */
+  async createGameArea(newArea: { chosenGame?: string; id: string; occupantsByID: Array<string> }) {
+    await this._townsService.createGameArea(this.townID, this.sessionToken, newArea);
+  }
+
+  /**
    * Create a new viewing area, sending the request to the townService. Throws an error if the request
    * is not successful. Does not immediately update local state about the new viewing area - it will be
    * updated once the townService creates the area and emits an interactableUpdate
@@ -540,6 +583,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
         this._conversationAreas = [];
         this._viewingAreas = [];
+        this._gameAreas = [];
         initialData.interactables.forEach(eachInteractable => {
           if (isConversationArea(eachInteractable)) {
             this._conversationAreasInternal.push(
@@ -550,6 +594,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             );
           } else if (isViewingArea(eachInteractable)) {
             this._viewingAreas.push(new ViewingAreaController(eachInteractable));
+          } else if (isGameArea(eachInteractable)) {
+            this._gameAreasInternal.push(
+              GameAreaController.fromGameAreaModel(eachInteractable, this._playersByIDs.bind(this)),
+            );
           }
         });
         this._userID = initialData.userID;
@@ -699,6 +747,32 @@ export function useActiveConversationAreas(): ConversationAreaController[] {
     };
   }, [townController, setConversationAreas]);
   return conversationAreas;
+}
+
+/**
+ * A react hook to retrieve the active conversation areas. This hook will re-render any components
+ * that use it when the set of conversation areas changes. It does *not* re-render its dependent components
+ * when the state of one of those areas changes - if that is desired, @see useConversationAreaTopic and @see useConversationAreaOccupants
+ *
+ * This hook relies on the TownControllerContext.
+ *
+ * @returns the list of conversation area controllers that are currently "active"
+ */
+export function useActiveGameAreas(): GameAreaController[] {
+  const townController = useTownController();
+  const [gameAreas, setGameAreas] = useState<GameAreaController[]>(
+    townController.gameAreas.filter(eachArea => !eachArea.isEmpty()),
+  );
+  useEffect(() => {
+    const updater = (allAreas: GameAreaController[]) => {
+      setGameAreas(allAreas.filter(eachArea => !eachArea.isEmpty()));
+    };
+    townController.addListener('gameAreasChanged', updater);
+    return () => {
+      townController.removeListener('gameAreasChanged', updater);
+    };
+  }, [townController, setGameAreas]);
+  return gameAreas;
 }
 
 /**
