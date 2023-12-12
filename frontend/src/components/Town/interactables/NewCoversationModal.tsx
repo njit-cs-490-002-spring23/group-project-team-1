@@ -19,6 +19,19 @@ export default function NewConversationModal(): Promise<JSX.Element> {
   const baseURL = 'http://localhost:5757';
   const stockfishFlag = false;
 
+  async function getBaseFen() {
+    let newFen: string;
+    newFen = '';
+    await axios
+      // eslint-disable-next-line object-shorthand
+      .get(`${baseURL}/fen`)
+      .then(response => response.data)
+      // eslint-disable-next-line no-return-assign
+      .then(data => (newFen = data.fen))
+      .catch(e => console.log(e));
+    console.log(`new fen (getBaseFen): ${newFen}`);
+  }
+
   // const currentleaderboard: { [username: string]: any } = leaderboardElo;
   const coveyTownController = useTownController();
   const newConversation = useInteractable('conversationArea');
@@ -31,6 +44,7 @@ export default function NewConversationModal(): Promise<JSX.Element> {
   const [fen, setFen] = useState('start'); // <- 2
   const [over, setOver] = useState('Not Over');
   const [inputFen, setInputFen] = useState('');
+  const [history, setHistory] = useState({});
   let turn;
 
   useEffect(() => {
@@ -38,9 +52,30 @@ export default function NewConversationModal(): Promise<JSX.Element> {
       method: 'POST',
     })
       .then(res => res.json())
+      .then(data => console.log(data))
       .catch(error => {
         console.error('Error initializing game:', error);
       });
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(async () => {
+      fetch(`${baseURL}/fen`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.fen !== fen) setFen(data.fen);
+          console.log(data.fen);
+        })
+        .catch(error => {
+          console.error('Error fen:', error);
+        });
+
+      if (over === 'Not Over') {
+        const isOver = (await axios.get(`${baseURL}/reason`)).data;
+        setOver(isOver.reason);
+        console.log(`Over: ${over}`);
+      }
+    }, 1000);
   }, []);
 
   function matchMove(
@@ -213,9 +248,9 @@ export default function NewConversationModal(): Promise<JSX.Element> {
       await stockfishMove(newFen.data.fen);
     }
 
-    const isOver = (await axios.get(`${baseURL}/reason`)).data;
-    setOver(isOver.reason);
-    console.log(`Over: ${over}`);
+    // const isOver = (await axios.get(`${baseURL}/reason`)).data;
+    // setOver(isOver.reason);
+    // console.log(`Over: ${over}`);
 
     return true;
   }
@@ -281,6 +316,26 @@ export default function NewConversationModal(): Promise<JSX.Element> {
     setFen(inputFen);
   };
 
+  const historyFunc = async (event: any) => {
+    console.log(`In historyFunc!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`);
+    if (!Object.keys(history).length) {
+      await axios
+        .get(`${baseURL}/history`)
+        .then(res => res.data)
+        .then(hist => setHistory(hist.history))
+        .catch(e => console.log(e));
+    }
+    console.log(history);
+  };
+
+  const loadHist = async (event: any) => {
+    console.log('YES HI HELLO');
+    const histFen = event.target.value;
+    console.log(histFen);
+    setInputFen(histFen);
+    handleSubmit(event);
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -320,6 +375,13 @@ export default function NewConversationModal(): Promise<JSX.Element> {
             onChange={e => setInputFen(e.target.value)}
           />
         </form>
+        {over === 'Not Over' ? '' : over}
+        <button onClick={historyFunc}>History</button>
+        {
+          // eslint-disable-next-line prettier/prettier
+          Object.keys(history).length ? Object.keys(history).map((key, index) => (<button key={index} value={history[key]} onClick={loadHist}> {key} </button>))
+            : ''
+        }
       </ModalContent>
     </Modal>
   );
