@@ -227,7 +227,10 @@ class ChessGame {
   public loadFen(fen: string): boolean {
     console.log(`LOADING!!!!! ${fen}`);
     this._game.load(fen);
-    if (this.getFen() === fen) return true;
+    if (this.getFen() === fen) {
+      this.winner = -1;
+      return true;
+    }
     return false;
   }
 

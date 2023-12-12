@@ -44,6 +44,7 @@ export default function NewConversationModal(): Promise<JSX.Element> {
   const [fen, setFen] = useState('start'); // <- 2
   const [over, setOver] = useState('Not Over');
   const [inputFen, setInputFen] = useState('');
+  const [history, setHistory] = useState({});
   let turn;
 
   useEffect(() => {
@@ -82,7 +83,7 @@ export default function NewConversationModal(): Promise<JSX.Element> {
 
     }, 1000);
 
-  }, [fen]);
+  }, []);
 
   function matchMove(
     piece: string,
@@ -322,6 +323,17 @@ export default function NewConversationModal(): Promise<JSX.Element> {
     setFen(inputFen);
   };
 
+  const historyFunc = async (event: any) => {
+    console.log(`In historyFunc!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`);
+    if (!Object.keys(history).length) {
+      await axios.get(`${baseURL}/history`)
+      .then(res => res.data)
+      .then(hist => setHistory(hist.history))
+      .catch(e => console.log(e));
+    }
+    console.log(history);
+  }
+
   return (
     <Modal
       isOpen={isOpen}
@@ -362,6 +374,10 @@ export default function NewConversationModal(): Promise<JSX.Element> {
           />
         </form>
         {over === 'Not Over' ? '' : over}
+        <button onClick={historyFunc}>History</button>
+        {
+          Object.keys(history).length ? Object.keys(history).map((key, index) => (<p key={index}> {key}: {history[key]}</p>)) : ''   
+        }
       </ModalContent>
     </Modal>
   );
