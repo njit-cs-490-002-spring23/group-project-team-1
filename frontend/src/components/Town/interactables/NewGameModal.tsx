@@ -436,7 +436,7 @@ export default function NewGameModal(): JSX.Element {
                     <div
                       {...props}
                       style={{
-                        ...props,
+                        ...props.style,
                         height: '12px',
                         width: '12px',
                         backgroundColor: '#000',
@@ -460,7 +460,7 @@ export default function NewGameModal(): JSX.Element {
                     </div>
                   )}
                   renderTrack={(props, state) => (
-                    <div {...props} style={{ ...props, backgroundColor: 'red', height: '10px' }} />
+                    <div {...props} style={{ ...props.style, backgroundColor: 'red', height: '10px' }} />
                   )}
                 />
               </th>
