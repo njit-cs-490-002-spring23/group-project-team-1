@@ -10,7 +10,7 @@ import {
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useInteractable } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
-// import Time from './time'; //
+import Time from './time'; //
 import { Chessboard } from 'react-chessboard'; //https://medium.com/@ryangregorydev/creating-a-chessboard-app-in-react-3fd9e2b2f6a6
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Chess, validateFen } from 'chess.js';
@@ -378,7 +378,9 @@ export default function NewConversationModal(): Promise<JSX.Element> {
         {over === 'Not Over' ? '' : over}
         <button onClick={historyFunc}>History</button>
         {
-          Object.keys(history).length ? Object.keys(history).map((key, index) => (<button key={index} value={history[key]} onClick={loadHist}> {key} </button>)) : ''   
+        // eslint-disable-next-line prettier/prettier
+          Object.keys(history).length ? Object.keys(history).map((key, index) => (<button key={index} value={history[key]} onClick={loadHist}> {key} </button>))
+            : ''
         }
       </ModalContent>
     </Modal>
