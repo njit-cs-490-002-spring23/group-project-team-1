@@ -326,12 +326,21 @@ export default function NewConversationModal(): Promise<JSX.Element> {
   const historyFunc = async (event: any) => {
     console.log(`In historyFunc!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`);
     if (!Object.keys(history).length) {
-      await axios.get(`${baseURL}/history`)
-      .then(res => res.data)
-      .then(hist => setHistory(hist.history))
-      .catch(e => console.log(e));
+      await axios
+        .get(`${baseURL}/history`)
+        .then(res => res.data)
+        .then(hist => setHistory(hist.history))
+        .catch(e => console.log(e));
     }
     console.log(history);
+  };
+
+  const loadHist = async (event: any) => {
+    console.log('YES HI HELLO');
+    const histFen = event.target.value;
+    console.log(histFen);
+    setInputFen(histFen);
+    handleSubmit(event);
   }
 
   return (
@@ -376,7 +385,7 @@ export default function NewConversationModal(): Promise<JSX.Element> {
         {over === 'Not Over' ? '' : over}
         <button onClick={historyFunc}>History</button>
         {
-          Object.keys(history).length ? Object.keys(history).map((key, index) => (<p key={index}> {key}: {history[key]}</p>)) : ''   
+          Object.keys(history).length ? Object.keys(history).map((key, index) => (<button key={index} value={history[key]} onClick={loadHist}> {key} </button>)) : ''   
         }
       </ModalContent>
     </Modal>
