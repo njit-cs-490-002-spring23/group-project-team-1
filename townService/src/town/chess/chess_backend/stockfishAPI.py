@@ -23,6 +23,7 @@ ELO_SET = False
 def get_top_move(fenPos):
      print("IN FUNCTION:", fenPos)
      if stockfish.is_fen_valid(fen=fenPos):
+          print("IN THE IF BEFORE SET")
           stockfish.set_fen_position(fenPos)
           print("IN IF TO GET MOVE")
           move = stockfish.get_best_move()
@@ -36,7 +37,7 @@ def get_best_moves(fenPos):
      if stockfish.is_fen_valid(fen=fenPos):
           print("IN IF FOR LIST")
           stockfish.set_fen_position(fenPos)
-          moveList = stockfish.get_top_moves(num_top_moves=10)
+          moveList = stockfish.get_top_moves(num_top_moves=3)
           print("GOT MOVE LIST STOCKFISH")
           return moveList
      return "Invalid Move"
@@ -71,6 +72,15 @@ def moveList():
     move_list = get_best_moves(fen)
     move_list = jsonify(move_list)
     return move_list
+
+@app.route("/real", methods=["POST"])
+def realMove():
+    print(request.get_json())
+    fen = request.get_json()
+    real_move = get_top_move(fen)
+    print(real_move)
+    real_move = jsonify(real_move)
+    return real_move
 
 if __name__ == "__main__": 
    print(get_top_move('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'))

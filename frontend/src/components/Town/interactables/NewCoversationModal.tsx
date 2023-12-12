@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import {
   Button,
   FormControl,
@@ -7,7 +8,6 @@ import {
   ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalFooter,
   ModalHeader,
   ModalOverlay,
   useToast,
