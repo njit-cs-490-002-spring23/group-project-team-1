@@ -1,23 +1,20 @@
 import {
   Button,
   Modal,
-  ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalFooter,
   ModalHeader,
   ModalOverlay,
   useToast,
 } from '@chakra-ui/react';
+import axios from 'axios';
+import { Chess, validateFen } from 'chess.js';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
-import { useInteractable } from '../../../classes/TownController';
-import { GameArea } from '../../../generated/client';
-import useTownController from '../../../hooks/useTownController';
 import ReactSlider from 'react-slider';
+import { useInteractable } from '../../../classes/TownController';
+import useTownController from '../../../hooks/useTownController';
 import Time from './time';
-import { Chess, validateFen } from 'chess.js';
-import axios from 'axios';
 
 export default function NewGameModal(): JSX.Element {
   const baseURL = 'http://localhost:5757';
@@ -290,7 +287,7 @@ export default function NewGameModal(): JSX.Element {
   //   },
   //   [] // Include 'fen' in the dependency array
   // );
-  
+
   const handleSubmit = async (event: any) => {
     event.preventDefault();
 
@@ -357,9 +354,6 @@ export default function NewGameModal(): JSX.Element {
     setHistory({});
     setInHistory(false);
   };
-
-
-  
 
   const isOpen = newGame !== undefined;
   useEffect(() => {
@@ -442,7 +436,7 @@ export default function NewGameModal(): JSX.Element {
                     <div
                       {...props}
                       style={{
-                        ...props.style,
+                        ...props,
                         height: '12px',
                         width: '12px',
                         backgroundColor: '#000',
@@ -466,10 +460,7 @@ export default function NewGameModal(): JSX.Element {
                     </div>
                   )}
                   renderTrack={(props, state) => (
-                    <div
-                      {...props}
-                      style={{ ...props.style, backgroundColor: 'red', height: '10px' }}
-                    />
+                    <div {...props} style={{ ...props, backgroundColor: 'red', height: '10px' }} />
                   )}
                 />
               </th>
@@ -499,7 +490,17 @@ export default function NewGameModal(): JSX.Element {
           </button>
           {
             // eslint-disable-next-line prettier/prettier
-          Object.keys(history).length ? Object.keys(history).map((key, index) => (<button key={index} value={history[key]} onClick={loadHist} style={{display: 'block', fontSize: 14}}> {`${key}: ${history[key].split(' ')[0]}`} </button>))
+            Object.keys(history).length
+              ? Object.keys(history).map((key, index) => (
+                  <button
+                    key={index}
+                    value={history[key]}
+                    onClick={loadHist}
+                    style={{ display: 'block', fontSize: 14 }}>
+                    {' '}
+                    {`${key}: ${history[key].split(' ')[0]}`}{' '}
+                  </button>
+                ))
               : ''
           }
         </div>
