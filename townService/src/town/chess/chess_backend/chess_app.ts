@@ -206,7 +206,6 @@ class ChessGame {
    * 'Insufficient Material' if there's insufficient material, 'Three Fold Repetition' for TFR, 'Draw' for draw state.
    */
   public getReasonForGameEnd(): string {
-    console.log('WINNER', this.winner);
     if (!this._game.isGameOver() && this.winner === -1) return 'Not Over';
     if (this._game.isCheckmate()) {
       this.checkIfCheckmate();

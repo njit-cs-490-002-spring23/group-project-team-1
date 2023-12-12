@@ -320,7 +320,7 @@ export default function NewConversationModal(): Promise<JSX.Element> {
 
   const historyFunc = async (event: any) => {
     console.log(`In historyFunc!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`);
-    if (!Object.keys(history).length) {
+    if (!Object.keys(history).length && over !== 'Not Over') {
       await axios
         .get(`${baseURL}/history`)
         .then(res => res.data)
@@ -348,6 +348,7 @@ export default function NewConversationModal(): Promise<JSX.Element> {
       .catch(error => {
         console.error('Error initializing game:', error);
       });
+    setHistory({});
   };
 
   return (
@@ -431,12 +432,13 @@ export default function NewConversationModal(): Promise<JSX.Element> {
           />
         </form>
         {over === 'Not Over' ? '' : over}
-        <button onClick={historyFunc}>History</button>
+        <br></br>
+        <button onClick={historyFunc} style={{ display: 'block', marginTop: '10px', textAlign: 'center' }}>History:</button>
         {
           // eslint-disable-next-line prettier/prettier
-          Object.keys(history).length ? Object.keys(history).map((key, index) => (<button key={index} value={history[key]} onClick={loadHist}> {key} </button>))
+          Object.keys(history).length ? Object.keys(history).map((key, index) => (<button key={index} value={history[key]} onClick={loadHist} style={{display: 'block', fontSize: 15}}> {`${key}: ${history[key].split(' ')[0]}`} </button>))
             : ''
-        }
+          }
         </div>
       </ModalContent>
     </Modal>
