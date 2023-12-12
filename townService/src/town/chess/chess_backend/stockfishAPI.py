@@ -23,6 +23,7 @@ ELO_SET = False
 def get_top_move(fenPos):
      print("IN FUNCTION:", fenPos)
      if stockfish.is_fen_valid(fen=fenPos):
+          print("IN THE IF BEFORE SET")
           stockfish.set_fen_position(fenPos)
           print("IN IF TO GET MOVE")
           move = stockfish.get_best_move()
