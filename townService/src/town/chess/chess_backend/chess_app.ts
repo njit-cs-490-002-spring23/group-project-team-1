@@ -208,8 +208,10 @@ class ChessGame {
   public getReasonForGameEnd(): string {
     console.log('WINNER', this.winner);
     if (!this._game.isGameOver() && this.winner === -1) return 'Not Over';
-    if (this._game.isCheckmate())
+    if (this._game.isCheckmate()) {
+      this.checkIfCheckmate();
       return `Checkmate - ${this.getTurn() === Colors.White ? Colors.Black : Colors.White}`;
+    }
     if (this._game.isInsufficientMaterial()) return 'Insufficient Material';
     if (this._game.isThreefoldRepetition()) return 'Three Fold Repetition';
     if (this._game.isDraw()) return 'Draw';
@@ -225,7 +227,10 @@ class ChessGame {
   public loadFen(fen: string): boolean {
     console.log(`LOADING!!!!! ${fen}`);
     this._game.load(fen);
-    if (this.getFen() === fen) return true;
+    if (this.getFen() === fen) {
+      this.winner = -1;
+      return true;
+    }
     return false;
   }
 

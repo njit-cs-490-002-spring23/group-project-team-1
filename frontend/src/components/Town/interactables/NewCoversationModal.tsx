@@ -19,22 +19,8 @@ export default function NewConversationModal(): Promise<JSX.Element> {
   const baseURL = 'http://localhost:5757';
   const [sliderValue, setSliderValue] = useState(300); // Initialize with the minimum value
 
-const handleSliderChange = (value: React.SetStateAction<number>) => {
-  setSliderValue(value);
-};
-  const saveSliderValue = () => {
-    // Assuming you have a state variable to hold the slider value
-    console.log('Saving slider value:', sliderValue);
-    // Implement the logic to save the slider value
-    setstockfishFlag(true);
-    
-  };
-  const disableStock = () => {
-    // Assuming you have a state variable to hold the slider value
-    console.log('stockfish is off');
-    // Implement the logic to save the slider value
-    setstockfishFlag(false);
-    
+  const handleSliderChange = (value: React.SetStateAction<number>) => {
+    setSliderValue(value);
   };
   // const currentleaderboard: { [username: string]: any } = leaderboardElo;
   const coveyTownController = useTownController();
@@ -48,16 +34,50 @@ const handleSliderChange = (value: React.SetStateAction<number>) => {
   const [stockfishFlag, setstockfishFlag] = useState(false); // <- 2
   const [over, setOver] = useState('Not Over');
   const [inputFen, setInputFen] = useState('');
+  const [history, setHistory] = useState({});
   let turn;
+  const saveSliderValue = () => {
+    // Assuming you have a state variable to hold the slider value
+    console.log('Saving slider value:', sliderValue);
+    // Implement the logic to save the slider value
+    setstockfishFlag(true);
+  };
+  const disableStock = () => {
+    // Assuming you have a state variable to hold the slider value
+    console.log('stockfish is off');
+    // Implement the logic to save the slider value
+    setstockfishFlag(false);
+  };
 
   useEffect(() => {
     fetch('http://localhost:5757/initialize/?player1=1&player2=2', {
       method: 'POST',
     })
       .then(res => res.json())
+      .then(data => console.log(data))
       .catch(error => {
         console.error('Error initializing game:', error);
       });
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(async () => {
+      fetch(`${baseURL}/fen`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.fen !== fen) setFen(data.fen);
+          console.log(data.fen);
+        })
+        .catch(error => {
+          console.error('Error fen:', error);
+        });
+
+      if (over === 'Not Over') {
+        const isOver = (await axios.get(`${baseURL}/reason`)).data;
+        setOver(isOver.reason);
+        console.log(`Over: ${over}`);
+      }
+    }, 1000);
   }, []);
 
   function matchMove(
@@ -230,9 +250,9 @@ const handleSliderChange = (value: React.SetStateAction<number>) => {
       await stockfishMove(newFen.data.fen);
     }
 
-    const isOver = (await axios.get(`${baseURL}/reason`)).data;
-    setOver(isOver.reason);
-    console.log(`Over: ${over}`);
+    // const isOver = (await axios.get(`${baseURL}/reason`)).data;
+    // setOver(isOver.reason);
+    // console.log(`Over: ${over}`);
 
     return true;
   }
@@ -296,6 +316,38 @@ const handleSliderChange = (value: React.SetStateAction<number>) => {
     //const moveResponse = await axios.post(`${baseURL}/move/${move}/?color=b`);
 
     setFen(inputFen);
+  };
+
+  const historyFunc = async (event: any) => {
+    console.log(`In historyFunc!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`);
+    if (!Object.keys(history).length) {
+      await axios
+        .get(`${baseURL}/history`)
+        .then(res => res.data)
+        .then(hist => setHistory(hist.history))
+        .catch(e => console.log(e));
+    }
+    console.log(history);
+  };
+
+  const loadHist = async (event: any) => {
+    console.log('YES HI HELLO');
+    const histFen = event.target.value;
+    console.log(histFen);
+    setInputFen(histFen);
+    handleSubmit(event);
+  };
+
+  const newGame = async (event: any) => {
+    fetch('http://localhost:5757/initialize/?player1=1&player2=2&force=true', {
+      method: 'POST',
+      body: JSON.stringify({ msg: 'force' }),
+    })
+      .then(res => res.json())
+      .then(data => console.log(data))
+      .catch(error => {
+        console.error('Error initializing game:', error);
+      });
   };
 
   return (
@@ -366,10 +418,10 @@ const handleSliderChange = (value: React.SetStateAction<number>) => {
   
     </table>
   </div>
-        <Button onClick={() => setShowChess(!showChess)}>start chess</Button>
+        <Button onClick={newGame}>Start New Game</Button>
         <Chessboard position={fen} onPieceDrop={onDrop} autoPromoteToQueen={true} />
         
-<div>
+    <div>
         <form onSubmit={handleSubmit}>
           <input
             type='text'
@@ -378,6 +430,13 @@ const handleSliderChange = (value: React.SetStateAction<number>) => {
             onChange={e => setInputFen(e.target.value)}
           />
         </form>
+        {over === 'Not Over' ? '' : over}
+        <button onClick={historyFunc}>History</button>
+        {
+          // eslint-disable-next-line prettier/prettier
+          Object.keys(history).length ? Object.keys(history).map((key, index) => (<button key={index} value={history[key]} onClick={loadHist}> {key} </button>))
+            : ''
+        }
         </div>
       </ModalContent>
     </Modal>
