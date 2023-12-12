@@ -12,7 +12,7 @@ export default class ChessHandler {
    * @param res JSON response containing starting FEN position and message if good.
    */
   static async initialize(req, res) {
-    if (game) {
+    if (game && !req.query.force) {
       const response = { message: 'Already made!', fen: game.getFen() };
       res.json(response);
       return;

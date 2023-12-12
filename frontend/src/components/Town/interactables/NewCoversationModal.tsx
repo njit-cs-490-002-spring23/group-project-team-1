@@ -1,51 +1,57 @@
+/* eslint-disable react/prop-types */
 import {
   Button,
   Modal,
   ModalCloseButton,
   ModalContent,
-  ModalFooter,
   ModalHeader,
   ModalOverlay,
 } from '@chakra-ui/react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import ReactSlider from 'react-slider';
 import { useInteractable } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
-import Time from './time'; //
+import Time from './time';
 import { Chessboard } from 'react-chessboard'; //https://medium.com/@ryangregorydev/creating-a-chessboard-app-in-react-3fd9e2b2f6a6
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Chess, validateFen } from 'chess.js';
 import axios from 'axios';
 export default function NewConversationModal(): Promise<JSX.Element> {
   const baseURL = 'http://localhost:5757';
-  const stockfishFlag = false;
+  const [sliderValue, setSliderValue] = useState(300); // Initialize with the minimum value
 
-  async function getBaseFen() {
-    let newFen: string;
-    newFen = '';
-    await axios
-      // eslint-disable-next-line object-shorthand
-      .get(`${baseURL}/fen`)
-      .then(response => response.data)
-      // eslint-disable-next-line no-return-assign
-      .then(data => (newFen = data.fen))
-      .catch(e => console.log(e));
-    console.log(`new fen (getBaseFen): ${newFen}`);
-  }
-
+  const handleSliderChange = (value: React.SetStateAction<number>) => {
+    setSliderValue(value);
+  };
   // const currentleaderboard: { [username: string]: any } = leaderboardElo;
   const coveyTownController = useTownController();
   const newConversation = useInteractable('conversationArea');
-  const [topic, setTopic] = useState<string>('');
   const [showTimer, setShowTimer] = useState(false);
   const [showChess, setShowChess] = useState(false);
   const [currentleaderboard, setLeaderboard] = useState({});
   // const [currentFen, setFen] = useState({});
   const chess = new Chess(); // <- 1
   const [fen, setFen] = useState('start'); // <- 2
+  const [stockfishFlag, setstockfishFlag] = useState(false); // <- 2
   const [over, setOver] = useState('Not Over');
   const [inputFen, setInputFen] = useState('');
   const [history, setHistory] = useState({});
+  const [list, setList] = useState();
+  const [inHistory, setInHistory] = useState(false);
+
   let turn;
+  const saveSliderValue = () => {
+    // Assuming you have a state variable to hold the slider value
+    console.log('Saving slider value:', sliderValue);
+    // Implement the logic to save the slider value
+    setstockfishFlag(true);
+  };
+  const disableStock = () => {
+    // Assuming you have a state variable to hold the slider value
+    console.log('stockfish is off');
+    // Implement the logic to save the slider value
+    setstockfishFlag(false);
+  };
 
   useEffect(() => {
     fetch('http://localhost:5757/initialize/?player1=1&player2=2', {
@@ -140,7 +146,7 @@ export default function NewConversationModal(): Promise<JSX.Element> {
   }
 
   async function stockfishMove(currfen: string) {
-    const initResponse = (await axios.post(`${baseURL}/stockfishinit/3000`)).data;
+    const initResponse = (await axios.post(`${baseURL}/stockfishinit/${sliderValue}`)).data;
     if (initResponse.status !== 200) console.log('Error!');
 
     console.log(`Init Response (83): ${initResponse}`);
@@ -318,7 +324,7 @@ export default function NewConversationModal(): Promise<JSX.Element> {
 
   const historyFunc = async (event: any) => {
     console.log(`In historyFunc!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`);
-    if (!Object.keys(history).length) {
+    if (!Object.keys(history).length && over !== 'Not Over') {
       await axios
         .get(`${baseURL}/history`)
         .then(res => res.data)
@@ -334,6 +340,35 @@ export default function NewConversationModal(): Promise<JSX.Element> {
     console.log(histFen);
     setInputFen(histFen);
     handleSubmit(event);
+    setInHistory(true);
+
+    const initResponse = (await axios.post(`${baseURL}/stockfishinit/3000`)).data;
+    if (initResponse.status !== 200) console.log('Error!');
+    console.log(`INIT RESPONSE: ${initResponse}`);
+    console.log(`INPUTFEN ${inputFen}`);
+    await axios
+      .post(`${baseURL}/stockfishreal`, { data: { fen: inputFen } })
+      .then(res => res.data)
+      .then(data => {
+        console.log(`DATA.REALMOVE: ${data.realMove}`);
+        setList(data.realMove);
+      })
+      .catch(e => console.log(e));
+    console.log(`LIST ${list}`);
+  };
+
+  const newGame = async (event: any) => {
+    fetch('http://localhost:5757/initialize/?player1=1&player2=2&force=true', {
+      method: 'POST',
+      body: JSON.stringify({ msg: 'force' }),
+    })
+      .then(res => res.json())
+      .then(data => console.log(data))
+      .catch(error => {
+        console.error('Error initializing game:', error);
+      });
+    setHistory({});
+    setInHistory(false);
   };
 
   return (
@@ -365,23 +400,102 @@ export default function NewConversationModal(): Promise<JSX.Element> {
         </table>
         <Button onClick={() => setShowTimer(!showTimer)}>Toggle Timer</Button>
         {showTimer && <Time />}
-        <Button onClick={() => setShowChess(!showChess)}>start chess</Button>
+        <div style={{ margin: '20px 0', display: 'flex', justifyContent: 'center' }}>
+          <table>
+            <tr style={{ textAlign: 'center' }}>
+              <th>
+                <Button onClick={saveSliderValue} style={{ display: 'block', marginTop: '10px' }}>
+                  Start A.I. game
+                </Button>
+              </th>
+              <th>
+                <Button onClick={disableStock} style={{ display: 'block', marginTop: '10px' }}>
+                  Start human game
+                </Button>
+              </th>
+            </tr>
+            <tr style={{ textAlign: 'center' }}>
+              <th>
+                {' '}
+                <p>Set A.I. Elo</p>{' '}
+              </th>
+              <th>
+                <ReactSlider
+                  className='horizontal-slider'
+                  marks
+                  markClassName='example-mark'
+                  min={300}
+                  max={3000}
+                  step={50}
+                  thumbClassName='example-thumb'
+                  trackClassName='example-track'
+                  value={sliderValue}
+                  onChange={handleSliderChange}
+                  renderThumb={(props, state) => (
+                    <div
+                      {...props}
+                      style={{
+                        ...props.style,
+                        height: '12px',
+                        width: '12px',
+                        backgroundColor: '#000',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        position: 'relative',
+                      }}>
+                      <div
+                        style={{
+                          position: 'absolute',
+                          bottom: '-25px',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          color: 'black',
+                          fontSize: '12px',
+                        }}>
+                        {state.valueNow}
+                      </div>
+                    </div>
+                  )}
+                  renderTrack={(props, state) => (
+                    <div
+                      {...props}
+                      style={{ ...props.style, backgroundColor: 'red', height: '10px' }}
+                    />
+                  )}
+                />
+              </th>
+            </tr>
+          </table>
+        </div>
+        <Button onClick={newGame}>Start New Game</Button>
         <Chessboard position={fen} onPieceDrop={onDrop} autoPromoteToQueen={true} />
-        <form onSubmit={handleSubmit}>
-          <input
-            type='text'
-            placeholder='Enter FEN String'
-            value={inputFen}
-            onChange={e => setInputFen(e.target.value)}
-          />
-        </form>
-        {over === 'Not Over' ? '' : over}
-        <button onClick={historyFunc}>History</button>
-        {
-          // eslint-disable-next-line prettier/prettier
-          Object.keys(history).length ? Object.keys(history).map((key, index) => (<button key={index} value={history[key]} onClick={loadHist}> {key} </button>))
-            : ''
-        }
+
+        <div>
+          <form onSubmit={handleSubmit}>
+            <input
+              type='text'
+              placeholder='Enter FEN String'
+              value={inputFen}
+              onChange={e => setInputFen(e.target.value)}
+            />
+          </form>
+          {over === 'Not Over' ? '' : over}
+          <br></br>
+          {inHistory ? `Stockfish Top Move: ${list}` : ''}
+          <br></br>
+          <button
+            onClick={historyFunc}
+            style={{ display: 'block', marginTop: '10px', textAlign: 'center' }}>
+            History:
+          </button>
+          {
+            // eslint-disable-next-line prettier/prettier
+          Object.keys(history).length ? Object.keys(history).map((key, index) => (<button key={index} value={history[key]} onClick={loadHist} style={{display: 'block', fontSize: 14}}> {`${key}: ${history[key].split(' ')[0]}`} </button>))
+              : ''
+          }
+        </div>
       </ModalContent>
     </Modal>
   );
