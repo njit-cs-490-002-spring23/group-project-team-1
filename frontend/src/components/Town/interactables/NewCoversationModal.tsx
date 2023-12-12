@@ -7,7 +7,7 @@ import {
   ModalOverlay,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
-import ReactSlider from 'react-slider'
+import ReactSlider from 'react-slider';
 import { useInteractable } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
 import Time from './time';
@@ -401,64 +401,98 @@ export default function NewConversationModal(): Promise<JSX.Element> {
         {showTimer && <Time />}
         <div style={{ margin: '20px 0', display: 'flex', justifyContent: 'center' }}>
           <table>
-            <tr style={{ textAlign: 'center' }}><th>
-    <Button onClick={saveSliderValue} style={{ display: 'block', marginTop: '10px' }}>
-      Start A.I. game
-    </Button>
-    </th><th>
-    <Button onClick={disableStock} style={{ display: 'block', marginTop: '10px' }}>
-      Start human game
-    </Button>
-    </th></tr>
             <tr style={{ textAlign: 'center' }}>
-            <th> <p>Set A.I. Elo</p> </th>
-            <th>
-    <ReactSlider
-      className="horizontal-slider"
-      marks
-      markClassName="example-mark"
-      min={300}
-      max={3000}
-      step={50}
-      thumbClassName="example-thumb"
-      trackClassName="example-track"
-      value={sliderValue}
-      onChange={handleSliderChange}
-      renderThumb={(props, state) => (
-        <div {...props} style={{ ...props.style, height: '12px', width: '12px', backgroundColor: '#000', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-          <div style={{ position: 'absolute', bottom: '-25px', left: '50%', transform: 'translateX(-50%)', color: 'black', fontSize: '12px' }}>
-            {state.valueNow}
-          </div>
+              <th>
+                <Button onClick={saveSliderValue} style={{ display: 'block', marginTop: '10px' }}>
+                  Start A.I. game
+                </Button>
+              </th>
+              <th>
+                <Button onClick={disableStock} style={{ display: 'block', marginTop: '10px' }}>
+                  Start human game
+                </Button>
+              </th>
+            </tr>
+            <tr style={{ textAlign: 'center' }}>
+              <th>
+                {' '}
+                <p>Set A.I. Elo</p>{' '}
+              </th>
+              <th>
+                <ReactSlider
+                  className='horizontal-slider'
+                  marks
+                  markClassName='example-mark'
+                  min={300}
+                  max={3000}
+                  step={50}
+                  thumbClassName='example-thumb'
+                  trackClassName='example-track'
+                  value={sliderValue}
+                  onChange={handleSliderChange}
+                  renderThumb={(props, state) => (
+                    <div
+                      {...props}
+                      style={{
+                        ...props.style,
+                        height: '12px',
+                        width: '12px',
+                        backgroundColor: '#000',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        position: 'relative',
+                      }}>
+                      <div
+                        style={{
+                          position: 'absolute',
+                          bottom: '-25px',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          color: 'black',
+                          fontSize: '12px',
+                        }}>
+                        {state.valueNow}
+                      </div>
+                    </div>
+                  )}
+                  renderTrack={(props, state) => (
+                    <div
+                      {...props}
+                      style={{ ...props.style, backgroundColor: 'red', height: '10px' }}
+                    />
+                  )}
+                />
+              </th>
+            </tr>
+          </table>
         </div>
-      )}     renderTrack={(props, state) => (
-        <div {...props} style={{ ...props.style, backgroundColor: 'red', height: '10px' }} />
-      )}    />
-    </th>
-    </tr>
-  
-    </table>
-  </div>
         <Button onClick={newGame}>Start New Game</Button>
         <Chessboard position={fen} onPieceDrop={onDrop} autoPromoteToQueen={true} />
-        
-    <div>
-        <form onSubmit={handleSubmit}>
-          <input
-            type='text'
-            placeholder='Enter FEN String'
-            value={inputFen}
-            onChange={e => setInputFen(e.target.value)}
-          />
-        </form>
-        {over === 'Not Over' ? '' : over}
-        <br></br>
-        {inHistory ? `Stockfish Top Move: ${list}` : ''}
-        <br></br>
-        <button onClick={historyFunc} style={{ display: 'block', marginTop: '10px', textAlign: 'center' }}>History:</button>
-        {
-          // eslint-disable-next-line prettier/prettier
+
+        <div>
+          <form onSubmit={handleSubmit}>
+            <input
+              type='text'
+              placeholder='Enter FEN String'
+              value={inputFen}
+              onChange={e => setInputFen(e.target.value)}
+            />
+          </form>
+          {over === 'Not Over' ? '' : over}
+          <br></br>
+          {inHistory ? `Stockfish Top Move: ${list}` : ''}
+          <br></br>
+          <button
+            onClick={historyFunc}
+            style={{ display: 'block', marginTop: '10px', textAlign: 'center' }}>
+            History:
+          </button>
+          {
+            // eslint-disable-next-line prettier/prettier
           Object.keys(history).length ? Object.keys(history).map((key, index) => (<button key={index} value={history[key]} onClick={loadHist} style={{display: 'block', fontSize: 14}}> {`${key}: ${history[key].split(' ')[0]}`} </button>))
-            : ''
+              : ''
           }
         </div>
       </ModalContent>
