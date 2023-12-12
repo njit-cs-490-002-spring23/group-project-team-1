@@ -378,7 +378,7 @@ export default function NewConversationModal(): Promise<JSX.Element> {
         {over === 'Not Over' ? '' : over}
         <button onClick={historyFunc}>History</button>
         {
-        // eslint-disable-next-line prettier/prettier
+          // eslint-disable-next-line prettier/prettier
           Object.keys(history).length ? Object.keys(history).map((key, index) => (<button key={index} value={history[key]} onClick={loadHist}> {key} </button>))
             : ''
         }
