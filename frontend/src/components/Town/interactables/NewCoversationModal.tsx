@@ -10,7 +10,7 @@ import {
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useInteractable } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
-import Time from './time'; //
+// import Time from './time'; //
 import { Chessboard } from 'react-chessboard'; //https://medium.com/@ryangregorydev/creating-a-chessboard-app-in-react-3fd9e2b2f6a6
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Chess, validateFen } from 'chess.js';
@@ -27,9 +27,9 @@ export default function NewConversationModal(): Promise<JSX.Element> {
       .get(`${baseURL}/fen`)
       .then(response => response.data)
       // eslint-disable-next-line no-return-assign
-      .then(data => newFen = data.fen)
+      .then(data => (newFen = data.fen))
       .catch(e => console.log(e));
-      console.log(`new fen (getBaseFen): ${newFen}`);
+    console.log(`new fen (getBaseFen): ${newFen}`);
   }
 
   // const currentleaderboard: { [username: string]: any } = leaderboardElo;
@@ -59,30 +59,23 @@ export default function NewConversationModal(): Promise<JSX.Element> {
   }, []);
 
   useEffect(() => {
-    let newFen: string;
-    newFen = '';
-
-    let timer;
-    timer = setInterval(async () => {
+    const timer = setInterval(async () => {
       fetch(`${baseURL}/fen`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.fen !== fen)
-          setFen(data.fen);
-        console.log(data.fen);
-      })
-      .catch(error => {
-        console.error('Error fen:', error);
-      });
+        .then(res => res.json())
+        .then(data => {
+          if (data.fen !== fen) setFen(data.fen);
+          console.log(data.fen);
+        })
+        .catch(error => {
+          console.error('Error fen:', error);
+        });
 
       if (over === 'Not Over') {
         const isOver = (await axios.get(`${baseURL}/reason`)).data;
         setOver(isOver.reason);
         console.log(`Over: ${over}`);
       }
-
     }, 1000);
-
   }, []);
 
   function matchMove(
@@ -341,7 +334,7 @@ export default function NewConversationModal(): Promise<JSX.Element> {
     console.log(histFen);
     setInputFen(histFen);
     handleSubmit(event);
-  }
+  };
 
   return (
     <Modal
