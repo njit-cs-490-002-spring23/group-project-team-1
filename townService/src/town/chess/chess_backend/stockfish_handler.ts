@@ -44,9 +44,19 @@ export default class StockfishHandler {
    * @param res JSON containing stockfish move list, use .moveList
    */
   static async getBestMoveList(req, res) {
-    const { fen } = req.body;
+    const { fen } = req.body.data;
+    console.log(req.body.data);
+    console.log(fen);
     await Stockfish.getBestMovesList(fen);
     const response = { moveList: Stockfish.getMoveList() };
+    res.json(response);
+  }
+
+  static async getRealMove(req, res) {
+    const { fen } = req.body.data;
+    console.log(`GETREALMOVE: ${fen}`);
+    await Stockfish.getReal(fen);
+    const response = { realMove: Stockfish.getRealMovee() };
     res.json(response);
   }
 }

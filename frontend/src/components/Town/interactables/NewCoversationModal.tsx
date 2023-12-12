@@ -35,6 +35,9 @@ export default function NewConversationModal(): Promise<JSX.Element> {
   const [over, setOver] = useState('Not Over');
   const [inputFen, setInputFen] = useState('');
   const [history, setHistory] = useState({});
+  const [list, setList] = useState();
+  const [inHistory, setInHistory] = useState(false);
+
   let turn;
   const saveSliderValue = () => {
     // Assuming you have a state variable to hold the slider value
@@ -336,6 +339,21 @@ export default function NewConversationModal(): Promise<JSX.Element> {
     console.log(histFen);
     setInputFen(histFen);
     handleSubmit(event);
+    setInHistory(true);
+
+    const initResponse = (await axios.post(`${baseURL}/stockfishinit/3000`)).data;
+    if (initResponse.status !== 200) console.log('Error!');
+    console.log(`INIT RESPONSE: ${initResponse}`);
+    console.log(`INPUTFEN ${inputFen}`);
+    await axios
+      .post(`${baseURL}/stockfishreal`, { data: { fen: inputFen } })
+      .then(res => res.data)
+      .then(data => {
+        console.log(`DATA.REALMOVE: ${data.realMove}`);
+        setList(data.realMove);
+      })
+      .catch(e => console.log(e));
+    console.log(`LIST ${list}`);
   };
 
   const newGame = async (event: any) => {
@@ -349,6 +367,7 @@ export default function NewConversationModal(): Promise<JSX.Element> {
         console.error('Error initializing game:', error);
       });
     setHistory({});
+    setInHistory(false);
   };
 
   return (
@@ -433,10 +452,12 @@ export default function NewConversationModal(): Promise<JSX.Element> {
         </form>
         {over === 'Not Over' ? '' : over}
         <br></br>
+        {inHistory ? `Stockfish Top Move: ${list}` : ''}
+        <br></br>
         <button onClick={historyFunc} style={{ display: 'block', marginTop: '10px', textAlign: 'center' }}>History:</button>
         {
           // eslint-disable-next-line prettier/prettier
-          Object.keys(history).length ? Object.keys(history).map((key, index) => (<button key={index} value={history[key]} onClick={loadHist} style={{display: 'block', fontSize: 15}}> {`${key}: ${history[key].split(' ')[0]}`} </button>))
+          Object.keys(history).length ? Object.keys(history).map((key, index) => (<button key={index} value={history[key]} onClick={loadHist} style={{display: 'block', fontSize: 14}}> {`${key}: ${history[key].split(' ')[0]}`} </button>))
             : ''
           }
         </div>
