@@ -24,14 +24,11 @@ export default function NewGameModal(): JSX.Element {
   const handleSliderChange = (value: React.SetStateAction<number>) => {
     setSliderValue(value);
   };
-  // const currentleaderboard: { [username: string]: any } = leaderboardElo;
   const coveyTownController = useTownController();
   const newGameModal = useInteractable('gameArea');
 
   const [showTimer, setShowTimer] = useState(false);
-  const [showChess, setShowChess] = useState(false);
   const [currentleaderboard, setLeaderboard] = useState({});
-  // const [currentFen, setFen] = useState({});
   const chess = new Chess(); // <- 1
   const [fen, setFen] = useState('start'); // <- 2
   const [stockfishFlag, setstockfishFlag] = useState(false); // <- 2
@@ -181,10 +178,6 @@ export default function NewGameModal(): JSX.Element {
 
     console.log(`Init Response (83): ${initResponse}`);
 
-    // let {move} = (await axios.get(`${baseURL}/stockfishmove`, {data: {fen: currfen} })).data;
-    // console.log(move);
-    //let moveResponse = await axios.get(`${baseURL}/stockfishmove`, {fen: currfen} );
-
     let newFen: string;
     newFen = 'abc';
 
@@ -205,7 +198,6 @@ export default function NewGameModal(): JSX.Element {
       // eslint-disable-next-line no-return-assign
       .then(data => console.log(`Loaded ${newFen}`))
       .catch(e => console.log(e));
-    //const moveResponse = await axios.post(`${baseURL}/move/${move}/?color=b`);
 
     setFen(newFen);
   }
@@ -285,7 +277,6 @@ export default function NewGameModal(): JSX.Element {
       promotion: 'q', // promote to queen where possible
     };
     console.log(moveData.color, 'move data color');
-    //const move = makeAMove(moveData);
     const pieceResponse = await axios.get(`${baseURL}/piece/${moveData.from}`);
     const pieceData = pieceResponse.data;
     const piece = pieceData.piece.toUpperCase();
@@ -299,10 +290,9 @@ export default function NewGameModal(): JSX.Element {
     move = matchMove(piece, move, moves, moveData.from, moveData.to, fen, pieceData.color);
     console.log(`After ${move}`);
 
-    //const move = `${moveData.to}`;
     // illegal move
     if (move === null) return false;
-    //setFen(chess.fen());
+
     if (!stockfishFlag) {
       const turnResponse = await axios.get(`${baseURL}/turn`);
       if (turnResponse.data.code !== 200) {
@@ -338,48 +328,12 @@ export default function NewGameModal(): JSX.Element {
     const newFen = await axios.get(`${baseURL}/fen`);
     console.log(newFen.data.fen);
     setFen(newFen.data.fen);
-    //let newFen = chess.fen();
-    //setFen(newFen);
-    //fen=newFen;
-    //console.log(`NEW FEN for real: ${newFen}`);
     if (stockfishFlag) {
       await stockfishMove(newFen.data.fen);
     }
 
-    // const isOver = (await axios.get(`${baseURL}/reason`)).data;
-    // setOver(isOver.reason);
-    // console.log(`Over: ${over}`);
-
     return true;
   }
-  // const makeAMove = useCallback(
-  //    (move) => {
-  //     try {
-  //       const result = chess.move(move);
-  //      //chess.move(move); // update Chess instance
-  //     //fen=chess.fen(); // chess.move(move);
-  //       console.log("over, checkmate", chess.isGameOver(), chess.isCheckmate());
-  //       if (chess.isGameOver()) { // check if move led to "game over"
-  //         if (chess.isCheckmate()) { // if reason for game over is a checkmate
-  //           // Set message to checkmate.
-  //           setOver(
-  //             `Checkmate! ${chess.turn() === "w" ? "black" : "white"} wins!`
-  //           );
-  //           // The winner is determined by checking which side made the last move
-  //         } else if (chess.isDraw()) { // if it is a draw
-  //           setOver("Draw"); // set message to "Draw"
-  //         } else {
-  //           setOver("Game over");
-  //         }
-  //       }
-  //       return result;
-  //     } catch (e) {
-  //       return null;
-  //     }
-  //      // null if the move was illegal, the move object if the move was legal
-  //   },
-  //   [] // Include 'fen' in the dependency array
-  // );
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
@@ -394,7 +348,6 @@ export default function NewGameModal(): JSX.Element {
       // eslint-disable-next-line no-return-assign
       .then(data => console.log(`Loaded ${inputFen}`))
       .catch(e => console.log(e));
-    //const moveResponse = await axios.post(`${baseURL}/move/${move}/?color=b`);
 
     setFen(inputFen);
   };
