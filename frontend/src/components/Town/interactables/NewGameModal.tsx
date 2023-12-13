@@ -37,6 +37,7 @@ export default function NewGameModal(): JSX.Element {
   const [history, setHistory] = useState({});
   const [list, setList] = useState();
   const [inHistory, setInHistory] = useState(false);
+  const [winner, setWinner] = useState('');
 
   let turn;
   const saveSliderValue = () => {
@@ -53,9 +54,12 @@ export default function NewGameModal(): JSX.Element {
   };
 
   useEffect(() => {
-    fetch('http://localhost:5757/initialize/?player1=1&player2=2', {
-      method: 'POST',
-    })
+    fetch(
+      `http://localhost:5757/initialize/?player1=${coveyTownController.ourPlayer.id}&player2=2`,
+      {
+        method: 'POST',
+      },
+    )
       .then(res => res.json())
       .then(data => console.log(data))
       .catch(error => {
@@ -79,6 +83,12 @@ export default function NewGameModal(): JSX.Element {
         const isOver = (await axios.get(`${baseURL}/reason`)).data;
         setOver(isOver.reason);
         console.log(`Over: ${over}`);
+      }
+      if (winner === '' || !winner) {
+        const getWinner = (await axios.get(`${baseURL}/winner`)).data;
+        setWinner(getWinner.winner);
+        console.log(getWinner);
+        console.log(`WINNER IN PER SECOND CALL: ${winner}`);
       }
     }, 1000);
   }, []);
@@ -182,6 +192,15 @@ export default function NewGameModal(): JSX.Element {
   async function onDrop(sourceSquare: any, targetSquare: any) {
     if (over !== 'Not Over') {
       console.log(over);
+
+      const getWinner = (await axios.get(`${baseURL}/winner`)).data;
+      console.log(getWinner);
+      setWinner(getWinner.winner);
+      console.log(`WINNER: ${winner}`);
+      console.log(
+        `TERINARY CHECK: ${winner === coveyTownController.ourPlayer.id ? 'WHITE' : 'BLACK'}`,
+      );
+
       return;
     }
     console.log(fen);
@@ -342,10 +361,13 @@ export default function NewGameModal(): JSX.Element {
   };
 
   const newGame = async (event: any) => {
-    fetch('http://localhost:5757/initialize/?player1=1&player2=2&force=true', {
-      method: 'POST',
-      body: JSON.stringify({ msg: 'force' }),
-    })
+    fetch(
+      `http://localhost:5757/initialize/?player1=${coveyTownController.ourPlayer.id}&player2=2&force=true`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ msg: 'force' }),
+      },
+    )
       .then(res => res.json())
       .then(data => console.log(data))
       .catch(error => {
@@ -355,7 +377,7 @@ export default function NewGameModal(): JSX.Element {
     setInHistory(false);
   };
 
-  const isOpen = newGame !== undefined;
+  const isOpen = newGameModal !== undefined;
   useEffect(() => {
     if (newGameModal) {
       coveyTownController.pause();

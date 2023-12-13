@@ -17,11 +17,11 @@ class ChessGame {
 
   private _game: Chess;
 
-  winner: number;
+  winner: string;
 
-  white_id: number;
+  white_id: string;
 
-  black_id: number;
+  black_id: string;
 
   timer: number;
 
@@ -34,11 +34,11 @@ class ChessGame {
    * @param blackID Player ID of black.
    * @param time_limit Optional: Timer value. If not set, defaults to infinity (999999).
    */
-  constructor(whiteID: number, blackID: number, time_limit = 999999) {
+  constructor(whiteID: string, blackID: string, time_limit = 999999) {
     this.gameID = Math.floor(Math.random() * 100000);
     this._game = new Chess();
     this._history = {};
-    this.winner = -1;
+    this.winner = '-1';
     this.white_id = whiteID;
     this.black_id = blackID;
     this.timer = time_limit;
@@ -59,7 +59,7 @@ class ChessGame {
       this.checkIfCheckmate();
       return false;
     }
-    if (this.winner !== -1) {
+    if (this.winner !== '-1') {
       return false;
     }
     return true;
@@ -206,15 +206,16 @@ class ChessGame {
    * 'Insufficient Material' if there's insufficient material, 'Three Fold Repetition' for TFR, 'Draw' for draw state.
    */
   public getReasonForGameEnd(): string {
-    if (!this._game.isGameOver() && this.winner === -1) return 'Not Over';
+    if (!this._game.isGameOver() && this.winner === '-1') return 'Not Over';
     if (this._game.isCheckmate()) {
       this.checkIfCheckmate();
-      return `Checkmate - ${this.getTurn() === Colors.White ? Colors.Black : Colors.White}`;
+      return `Checkmate - ${this.getTurn() === Colors.White ? 'Black' : 'White'}`;
     }
     if (this._game.isInsufficientMaterial()) return 'Insufficient Material';
     if (this._game.isThreefoldRepetition()) return 'Three Fold Repetition';
     if (this._game.isDraw()) return 'Draw';
-    if (this.winner !== -1) return 'Concede';
+    if (this.winner !== '-1')
+      return `Concede / Timeout - Winner is ${this.winner === '2' ? 'Black' : 'White'}`;
     return 'Not Over';
   }
 
@@ -227,7 +228,7 @@ class ChessGame {
     console.log(`LOADING!!!!! ${fen}`);
     this._game.load(fen);
     if (this.getFen() === fen) {
-      this.winner = -1;
+      this.winner = '-1';
       return true;
     }
     return false;
