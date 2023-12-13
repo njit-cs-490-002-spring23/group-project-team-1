@@ -59,23 +59,13 @@ function useTimer() {
   const [isRunning, setIsRunning] = useState(false);
   const [currentTurn, setCurrentTurn] = useState('white'); // Track the current turn
 
-  useEffect(async () => {
+  useEffect( () => {
     let timer;
     const baseURL = 'http://localhost:5757';
-    const fenResponse = await axios.get(`${baseURL}/fen`);
-        if (fenResponse.data.code !== 200) {
-          console.error('Error getting turn:', fenResponse.data);
-          return false;
-        }
-        console.log(fenResponse.fen)
-        if (fenResponse.fen !== "rnbqkbnr/pppppppp/8/8/8/4P3/PPPP1PPP/RNBQKBNR b KQkq - 0"){
-        setIsRunning(true);
-        }
+
     if (isRunning) {
       timer = setInterval(async () => {
         // Fetch the current turn from the server
-        
-        
         const turnResponse = await axios.get(`${baseURL}/turn`);
         if (turnResponse.data.code !== 200) {
           console.error('Error getting turn:', turnResponse.data);
@@ -104,7 +94,6 @@ function useTimer() {
         }
       }, 1000);
     }
-
     return () => {
       clearInterval(timer);
     };
@@ -134,7 +123,7 @@ function useTimer() {
       setDelayB(600);
     }
   }
-
+  
   function starttime() {
     setIsRunning(true);
   }
