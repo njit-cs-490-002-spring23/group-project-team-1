@@ -60,13 +60,11 @@ export default function NewGameModal(): JSX.Element {
       .then(res => res.json())
       .then(data => {
         console.log(data);
-        if (data.message === 'Good!')
-          setWhite(true);
+        if (data.message === 'Good!') setWhite(true);
       })
       .catch(error => {
         console.error('Error initializing game:', error);
       });
-      
     fetch(`${baseURL}/eloInitialize`)
       .then(res => res.json())
       .then(data => console.log(data.message))
