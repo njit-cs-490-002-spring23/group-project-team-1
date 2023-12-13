@@ -10,15 +10,15 @@ import { Colors } from './chess_app';
 
 describe('Chess Game', () => {
   let game: ChessGame;
-  const whiteID = 123;
-  const blackID = 321;
+  const whiteID = '123';
+  const blackID = '321';
   beforeEach(() => {
     game = new ChessGame(whiteID, blackID);
   });
   describe('Initalize Game', () => {
     it('Adds the players IDs to the respective colors.', () => {
-      expect(game.white_id).toEqual(123);
-      expect(game.black_id).toEqual(321);
+      expect(game.white_id).toEqual('123');
+      expect(game.black_id).toEqual('321');
     });
     it('Initalizes the game ID to a value', () => {
       expect(game.gameID).toBeGreaterThan(0);
