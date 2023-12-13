@@ -435,7 +435,13 @@ export default function NewGameModal(): JSX.Element {
           <table>
             <tr style={{ textAlign: 'center' }}>
               <th>
-              <Button onClick={() => { setaitimer(); saveSliderValue(); setShowTimer(!showTimer); }} style={{ display: 'block', marginTop: '10px' }}>
+                <Button
+                  onClick={() => {
+                    setaitimer();
+                    saveSliderValue();
+                    setShowTimer(!showTimer);
+                  }}
+                  style={{ display: 'block', marginTop: '10px' }}>
                   Set game to A.I.
                 </Button>
               </th>
@@ -471,6 +477,7 @@ export default function NewGameModal(): JSX.Element {
                     <div
                       {...props}
                       style={{
+                        // eslint-disable-next-line react/prop-types
                         ...props.style,
                         height: '12px',
                         width: '12px',
@@ -495,7 +502,11 @@ export default function NewGameModal(): JSX.Element {
                     </div>
                   )}
                   renderTrack={(props, state) => (
-                    <div {...props} style={{ ...props.style, backgroundColor: 'red', height: '10px' }} />
+                    <div
+                      {...props}
+                      // eslint-disable-next-line react/prop-types
+                      style={{ ...props.style, backgroundColor: 'red', height: '10px' }}
+                    />
                   )}
                 />
               </th>
