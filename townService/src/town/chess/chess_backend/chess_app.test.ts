@@ -98,7 +98,7 @@ describe('Chess Game', () => {
       game.concede(Colors.White);
       expect(game.winner).toEqual(game.black_id);
       expect(game.make_move('e4', Colors.White)).toEqual('Error');
-      expect(game.getReasonForGameEnd()).toEqual('Concede');
+      expect(game.getReasonForGameEnd()).toEqual('Concede / Timeout - Winner is White');
     });
   });
 
