@@ -37,7 +37,7 @@ divStyle.defaultProps = {
 };
 
 //base line timer
-function useTimer() {
+export default function useTimer() {
   function TimerW({ minutes = 0, seconds = 0 }) {
     return <div>{minutes > 10 ? '∞' : `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`}</div>;
   }
@@ -59,10 +59,9 @@ function useTimer() {
   const [isRunning, setIsRunning] = useState(false);
   const [currentTurn, setCurrentTurn] = useState('white'); // Track the current turn
 
-  useEffect( () => {
+  useEffect(() => {
     let timer;
     const baseURL = 'http://localhost:5757';
-
     if (isRunning) {
       timer = setInterval(async () => {
         // Fetch the current turn from the server
@@ -84,16 +83,17 @@ function useTimer() {
           clearInterval(timer);
           setIsRunning(false);
           console.log('Timer has stopped because white Time reached 0:00');
-          await axios.post(`http://localhost:5757/concede/:w`);
+          await axios.post(`http://localhost:5757/concede/w`);
         }
         if (delayB === 0) {
           clearInterval(timer);
           setIsRunning(false);
           console.log('Timer has stopped because  black Time reached 0:00');
-          await axios.post('http://localhost:5757/concede/:b');
+          await axios.post('http://localhost:5757/concede/b');
         }
       }, 1000);
     }
+
     return () => {
       clearInterval(timer);
     };
@@ -123,7 +123,7 @@ function useTimer() {
       setDelayB(600);
     }
   }
-  
+
   function starttime() {
     setIsRunning(true);
   }
@@ -237,4 +237,4 @@ function useTimer() {
   );
 }
 
-export default useTimer;
+//export default useTimer;

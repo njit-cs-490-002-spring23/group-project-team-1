@@ -200,7 +200,6 @@ export default function NewGameModal(): JSX.Element {
       console.log(
         `TERINARY CHECK: ${winner === coveyTownController.ourPlayer.id ? 'WHITE' : 'BLACK'}`,
       );
-
       return;
     }
     console.log(fen);
@@ -431,7 +430,7 @@ export default function NewGameModal(): JSX.Element {
           ))}
         </table>
         {!hideaitimer && <Button onClick={() => setShowTimer(!showTimer)}>Toggle Timer</Button>}
-      {showTimer && !hideaitimer && <Time />} 
+        {showTimer && !hideaitimer && <Time />}
         <div style={{ margin: '20px 0', display: 'flex', justifyContent: 'center' }}>
           <table>
             <tr style={{ textAlign: 'center' }}>
@@ -441,7 +440,12 @@ export default function NewGameModal(): JSX.Element {
                 </Button>
               </th>
               <th>
-                <Button onClick={() => {disableStock; sethumantimer();}} style={{ display: 'block', marginTop: '10px' }}>
+                <Button
+                  onClick={() => {
+                    disableStock();
+                    sethumantimer();
+                  }}
+                  style={{ display: 'block', marginTop: '10px' }}>
                   set game to PVP
                 </Button>
               </th>
