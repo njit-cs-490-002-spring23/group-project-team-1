@@ -37,6 +37,7 @@ export default function NewGameModal(): JSX.Element {
   const [winner, setWinner] = useState('');
   const [userAddedFlag, setUserAddedFlag] = useState(false);
   const [twoPlayerFlag, setTwoPlayerFlag] = useState(false);
+  const [isWhite, setWhite] = useState(false);
 
   let turn;
   const saveSliderValue = () => {
@@ -57,11 +58,15 @@ export default function NewGameModal(): JSX.Element {
       method: 'POST',
     })
       .then(res => res.json())
-      .then(data => console.log(data))
+      .then(data => {
+        console.log(data);
+        if (data.message === 'Good!')
+          setWhite(true);
+      })
       .catch(error => {
         console.error('Error initializing game:', error);
       });
-
+      
     fetch(`${baseURL}/eloInitialize`)
       .then(res => res.json())
       .then(data => console.log(data.message))
@@ -427,6 +432,14 @@ export default function NewGameModal(): JSX.Element {
     sethideaitimer(false);
   }
 
+  const concede = async () => {
+    if (isWhite) {
+      await axios.post('http://localhost:5757/concede/w');
+    } else {
+      await axios.post('http://localhost:5757/concede/b');
+    }
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -550,6 +563,8 @@ export default function NewGameModal(): JSX.Element {
               onChange={e => setInputFen(e.target.value)}
             />
           </form>
+          <button onClick={concede}>Concede</button>
+          <br></br>
           {over === 'Not Over' ? '' : over}
           <br></br>
           {inHistory ? `Stockfish Top Move: ${list}` : ''}
