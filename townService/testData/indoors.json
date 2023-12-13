@@ -498,7 +498,7 @@
                  "y":1104.66683333333
                 }, 
                 {
-                 "type":"ConversationArea",
+                 "type":"GameArea",
                  "height":125.333,
                  "id":29,
                  "name":"Basement Lounge",
