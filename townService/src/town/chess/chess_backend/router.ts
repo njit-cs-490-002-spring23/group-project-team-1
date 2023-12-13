@@ -3,8 +3,7 @@ import ChessGame from './chess_app';
 // eslint-disable-next-line import/no-named-as-default
 import ChessHandler from './chess_handler';
 import StockfishHandler from './stockfish_handler';
-
-import DatabaseHandler from '../database/database_handler';
+import EloHandler from '../database/elo_handler';
 
 const router = Express.Router();
 // const chess = new ChessGame(1, 2);
@@ -29,8 +28,10 @@ router.route('/stockfishmove').post(StockfishHandler.getBestMove);
 router.route('/stockfishlist').post(StockfishHandler.getBestMoveList);
 router.route('/stockfishreal').post(StockfishHandler.getRealMove);
 
-router.route('/databaseinit').post(DatabaseHandler.initialize);
-router.route('/databaseleaderboard').get(DatabaseHandler.databaseGetAll);
-router.route('/updateElo').post(DatabaseHandler.databaseSetELO);
+router.route('/eloInitialize').get(EloHandler.eloInitialize);
+router.route('/eloAddToList').post(EloHandler.eloAddToList);
+router.route('/eloSetScore/:score').post(EloHandler.eloSetScore);
+router.route('/eloUpdate').get(EloHandler.eloUpdate);
+router.route('/eloGetLeaderboard').get(EloHandler.eloGetLeaderboard);
 
 export default router;

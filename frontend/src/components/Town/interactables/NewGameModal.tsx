@@ -41,6 +41,8 @@ export default function NewGameModal(): JSX.Element {
   const [list, setList] = useState();
   const [inHistory, setInHistory] = useState(false);
   const [winner, setWinner] = useState('');
+  const [userAddedFlag, setUserAddedFlag] = useState(false);
+  const [twoPlayerFlag, setTwoPlayerFlag] = useState(false);
 
   let turn;
   const saveSliderValue = () => {
@@ -57,17 +59,24 @@ export default function NewGameModal(): JSX.Element {
   };
 
   useEffect(() => {
-    fetch(
-      `http://localhost:5757/initialize/?player1=${coveyTownController.ourPlayer.id}&player2=2`,
-      {
-        method: 'POST',
-      },
-    )
+    fetch(`${baseURL}/initialize/?player1=${coveyTownController.ourPlayer.id}&player2=2`, {
+      method: 'POST',
+    })
       .then(res => res.json())
       .then(data => console.log(data))
       .catch(error => {
         console.error('Error initializing game:', error);
       });
+
+    fetch(`${baseURL}/eloInitialize`)
+      .then(res => res.json())
+      .then(data => console.log(data.message))
+      .catch(e => console.log(e));
+
+    fetch(`${baseURL}/eloGetLeaderboard`)
+      .then(res => res.json())
+      .then(data => setLeaderboard(data.leaderboard))
+      .catch(e => console.log(e));
   }, []);
 
   useEffect(() => {
@@ -94,6 +103,15 @@ export default function NewGameModal(): JSX.Element {
         console.log(`WINNER IN PER SECOND CALL: ${winner}`);
       }
     }, 1000);
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(async () => {
+      fetch(`${baseURL}/eloGetLeaderboard`)
+        .then(res => res.json())
+        .then(data => setLeaderboard(data.leaderboard))
+        .catch(e => console.log(e));
+    }, 8000);
   }, []);
 
   function matchMove(
@@ -203,8 +221,62 @@ export default function NewGameModal(): JSX.Element {
       console.log(
         `TERINARY CHECK: ${winner === coveyTownController.ourPlayer.id ? 'WHITE' : 'BLACK'}`,
       );
-      return;
+
+      await axios
+        .post(`${baseURL}/eloAddToList`, { username: coveyTownController.ourPlayer.userName })
+        .then(res => res.data)
+        .then(data => setTwoPlayerFlag(data.arraySet))
+        .catch(e => console.log(e));
+
+      console.log(`STOCKFISH FLAG: ${stockfishFlag} && TWOPLAYERFLAG: ${twoPlayerFlag}`);
+      if (!stockfishFlag && twoPlayerFlag) {
+        const winnerColor = winner === coveyTownController.ourPlayer.id ? 'WHITE' : 'BLACK';
+
+        if (
+          winner === '-1' ||
+          over === 'Insufficient Material' ||
+          over === 'Draw' ||
+          over == 'Three Fold Repetition'
+        ) {
+          console.log('DATABASE SAYS ITS A TIE');
+          await axios
+            .post(`${baseURL}/eloSetScore/0.5`)
+            .then(res => res.data)
+            .then(data => console.log(data.message))
+            .catch(e => console.log(e));
+          return;
+        }
+
+        if (winnerColor === 'WHITE') {
+          await axios
+            .post(`${baseURL}/eloSetScore/1`)
+            .then(res => res.data)
+            .then(data => console.log(data.message))
+            .catch(e => console.log(e));
+        } else {
+          await axios
+            .post(`${baseURL}/eloSetScore/0`)
+            .then(res => res.data)
+            .then(data => console.log(data.message))
+            .catch(e => console.log(e));
+        }
+        await axios
+          .get(`${baseURL}/eloUpdate`)
+          .then(res => res.data)
+          .then(data => console.log(data.message))
+          .catch(e => console.log(e));
+      }
     }
+    if (!userAddedFlag) {
+      await axios
+        .post(`${baseURL}/eloAddToList`, { username: coveyTownController.ourPlayer.userName })
+        .then(res => res.data)
+        .then(data => setTwoPlayerFlag(data.arraySet))
+        .catch(e => console.log(e));
+      setUserAddedFlag(true);
+      console.log(userAddedFlag);
+    }
+
     console.log(fen);
     const moveData = {
       from: sourceSquare,
@@ -414,7 +486,7 @@ export default function NewGameModal(): JSX.Element {
       }}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader> LeaderBoard </ModalHeader>
+        <ModalHeader> Leaderboard </ModalHeader>
         <ModalCloseButton />
         <table>
           <tr>
@@ -445,7 +517,7 @@ export default function NewGameModal(): JSX.Element {
                     setShowTimer(!showTimer);
                   }}
                   style={{ display: 'block', marginTop: '10px' }}>
-                  Set game to A.I.
+                  Set Game verse Stockfish
                 </Button>
               </th>
               <th>
@@ -455,7 +527,7 @@ export default function NewGameModal(): JSX.Element {
                     sethumantimer();
                   }}
                   style={{ display: 'block', marginTop: '10px' }}>
-                  set game to PVP
+                  Set Game to PVP
                 </Button>
               </th>
             </tr>
