@@ -616,7 +616,7 @@ export default function NewGameModal(): JSX.Element {
                     onClick={loadHist}
                     style={{ display: 'block', fontSize: 14 }}>
                     {' '}
-                    {`${key}: ${history[key].split(' ')[0]}`}{' '}
+                    {`${key}`}{' '}
                   </button>
                 ))
               : ''
