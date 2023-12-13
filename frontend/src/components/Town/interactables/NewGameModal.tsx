@@ -355,7 +355,7 @@ export default function NewGameModal(): JSX.Element {
     setInHistory(false);
   };
 
-  const isOpen = newGame !== undefined;
+  const isOpen = newGameModal !== undefined;
   useEffect(() => {
     if (newGameModal) {
       coveyTownController.pause();
