@@ -1,4 +1,3 @@
-import { Matcher } from 'jest-mock-extended';
 import MatchResult from './elo';
 
 let match;
@@ -17,9 +16,10 @@ export default class EloHandler {
     console.log(req.body);
     match.addToList(req.body.username);
     if (match) {
-      const response = { 
+      const response = {
         message: 'Added to Username List',
-        arraySet: match.player1_user ? true : false
+        // eslint-disable-next-line no-unneeded-ternary
+        arraySet: match.player1_user ? true : false,
       };
       res.json(response);
     }
@@ -52,7 +52,7 @@ export default class EloHandler {
     try {
       const response = {
         leaderboard: await MatchResult.leaderboardElo(),
-        message: 'Returned leaderboard'
+        message: 'Returned leaderboard',
       };
       console.log(await MatchResult.leaderboardElo());
       res.json(response);

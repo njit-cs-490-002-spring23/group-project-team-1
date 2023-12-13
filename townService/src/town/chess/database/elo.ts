@@ -1,4 +1,3 @@
-import { includes } from 'ramda';
 import Database from './database';
 
 export default class MatchResult {
@@ -8,7 +7,7 @@ export default class MatchResult {
 
   game_score: number;
 
-  usernameList: string [];
+  usernameList: string[];
 
   /**
    * Initializes the MatchResult object.
@@ -31,7 +30,9 @@ export default class MatchResult {
       this.usernameList.push(user);
 
     if (this.usernameList.length === 2) {
+      // eslint-disable-next-line prefer-destructuring
       this.player1_user = this.usernameList[0];
+      // eslint-disable-next-line prefer-destructuring
       this.player2_user = this.usernameList[1];
     }
   }
@@ -89,15 +90,3 @@ export default class MatchResult {
     return output;
   }
 }
-
-// const result = new MatchResult('Deep Blue', 'Kevin', 1);
-// result.updateElo();
-
-// const output: { [username: string]: any } | null = await MatchResult.leaderboardElo();
-// console.log(output);
-// for (const key in output) {
-//   if (Object.hasOwn(output, key)) {
-//     const value = output[key];
-//     console.log(`${key} ${value}`);
-//   }
-// }
