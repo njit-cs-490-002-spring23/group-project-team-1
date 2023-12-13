@@ -394,6 +394,15 @@ export default function NewGameModal(): JSX.Element {
 
   const toast = useToast();
 
+  const [hideaitimer, sethideaitimer] = useState(false);
+
+  function setaitimer() {
+    sethideaitimer(true);
+  }
+  function sethumantimer() {
+    sethideaitimer(false);
+  }
+
   return (
     <Modal
       isOpen={isOpen}
@@ -421,19 +430,19 @@ export default function NewGameModal(): JSX.Element {
             </tr>
           ))}
         </table>
-        <Button onClick={() => setShowTimer(!showTimer)}>Toggle Timer</Button>
-        {showTimer && <Time />}
+        {!hideaitimer && <Button onClick={() => setShowTimer(!showTimer)}>Toggle Timer</Button>}
+      {showTimer && !hideaitimer && <Time />} 
         <div style={{ margin: '20px 0', display: 'flex', justifyContent: 'center' }}>
           <table>
             <tr style={{ textAlign: 'center' }}>
               <th>
-                <Button onClick={saveSliderValue} style={{ display: 'block', marginTop: '10px' }}>
-                  Start A.I. game
+              <Button onClick={() => { setaitimer(); saveSliderValue(); setShowTimer(!showTimer); }} style={{ display: 'block', marginTop: '10px' }}>
+                  Set game to A.I.
                 </Button>
               </th>
               <th>
-                <Button onClick={disableStock} style={{ display: 'block', marginTop: '10px' }}>
-                  Start human game
+                <Button onClick={() => {disableStock; sethumantimer();}} style={{ display: 'block', marginTop: '10px' }}>
+                  set game to PVP
                 </Button>
               </th>
             </tr>
