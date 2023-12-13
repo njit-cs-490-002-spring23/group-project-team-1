@@ -23,7 +23,7 @@ class Database {
     const connection = mysql.createConnection({
       host: 'localhost',
       user: 'root',
-      password: 'daphne99',
+      password: 'coveytown',
       database: 'chesselo',
     });
     return connection;
