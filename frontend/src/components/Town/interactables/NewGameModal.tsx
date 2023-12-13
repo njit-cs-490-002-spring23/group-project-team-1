@@ -14,6 +14,8 @@ import { Chessboard } from 'react-chessboard';
 import ReactSlider from 'react-slider';
 import { useInteractable } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
+import { GameArea } from '../../../types/CoveyTownSocket';
+import { isGameArea } from '../../../types/TypeUtils';
 import Time from './time';
 
 export default function NewGameModal(): JSX.Element {
@@ -25,6 +27,7 @@ export default function NewGameModal(): JSX.Element {
   // const currentleaderboard: { [username: string]: any } = leaderboardElo;
   const coveyTownController = useTownController();
   const newGameModal = useInteractable('gameArea');
+
   const [showTimer, setShowTimer] = useState(false);
   const [showChess, setShowChess] = useState(false);
   const [currentleaderboard, setLeaderboard] = useState({});
