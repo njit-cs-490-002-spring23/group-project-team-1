@@ -27,7 +27,7 @@ describe('Chess Game', () => {
       expect(game.timer).toEqual(999999);
     });
     it('Didnt assign a winner.', () => {
-      expect(game.winner).toEqual(-1);
+      expect(game.winner).toEqual('-1');
     });
   });
 
@@ -89,12 +89,12 @@ describe('Chess Game', () => {
 
   describe('Concede', () => {
     it('Sets the winner', () => {
-      expect(game.winner).toEqual(-1);
+      expect(game.winner).toEqual('-1');
       game.concede(Colors.White);
       expect(game.winner).toEqual(game.black_id);
     });
     it('Ends the game', () => {
-      expect(game.winner).toEqual(-1);
+      expect(game.winner).toEqual('-1');
       game.concede(Colors.White);
       expect(game.winner).toEqual(game.black_id);
       expect(game.make_move('e4', Colors.White)).toEqual('Error');
