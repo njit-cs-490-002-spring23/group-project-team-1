@@ -59,7 +59,7 @@ function useTimer() {
   const [isRunning, setIsRunning] = useState(false);
   const [currentTurn, setCurrentTurn] = useState('white'); // Track the current turn
 
-  useEffect( () => {
+  useEffect(() => {
     let timer;
     const baseURL = 'http://localhost:5757';
 
@@ -123,7 +123,7 @@ function useTimer() {
       setDelayB(600);
     }
   }
-  
+
   function starttime() {
     setIsRunning(true);
   }
