@@ -1,3 +1,4 @@
+import { includes } from 'ramda';
 import Database from './database';
 
 export default class MatchResult {
@@ -7,6 +8,8 @@ export default class MatchResult {
 
   game_score: number;
 
+  usernameList: string [];
+
   /**
    * Initializes the MatchResult object.
    * The order in which you initialize the parameters matter. The score is from the perspective of Player 1.
@@ -15,9 +18,25 @@ export default class MatchResult {
    * @param userPlayer2 Username of Player 2 of type string.
    * @param score The result in regards to Player 1 {0 = Loss / 0.5 Draw / 1 = Win}.
    */
-  constructor(userPlayer1: string, userPlayer2: string, score: number) {
-    this.player1_user = userPlayer1;
-    this.player2_user = userPlayer2;
+  constructor() {
+    this.player1_user = '';
+    this.player2_user = '';
+    this.game_score = -1;
+    this.usernameList = [];
+  }
+
+  addToList(user: string) {
+    console.log(user);
+    if (!this.usernameList.includes(user) && this.usernameList.length < 2)
+      this.usernameList.push(user);
+
+    if (this.usernameList.length === 2) {
+      this.player1_user = this.usernameList[0];
+      this.player2_user = this.usernameList[1];
+    }
+  }
+
+  setScore(score: number) {
     this.game_score = score;
   }
 

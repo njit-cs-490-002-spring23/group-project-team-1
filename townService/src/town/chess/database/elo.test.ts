@@ -11,21 +11,24 @@ describe('Elo', () => {
 
   describe('calculate rating change for a match', () => {
     it('correctly calculates the change for a loss', async () => {
-      testMatch = new MatchResult('Tester1', 'Tester2', 0);
+      testMatch = new MatchResult();
       const elo1 = 1500;
       const elo2 = 1500;
+      testMatch.game_score = 0;
       await expect(testMatch._calculateRatingChange(elo1, elo2)).toEqual(-10);
     });
     it('correctly calculates the change for a tie', async () => {
-      testMatch = new MatchResult('Tester1', 'Tester2', 0.5);
+      testMatch = new MatchResult();
       const elo1 = 1500;
       const elo2 = 1500;
+      testMatch.game_score = 0.5;
       await expect(testMatch._calculateRatingChange(elo1, elo2)).toEqual(0);
     });
     it('correctly calculates the change for a win', async () => {
-      testMatch = new MatchResult('Tester1', 'Tester2', 1);
+      testMatch = new MatchResult();
       const elo1 = 1500;
       const elo2 = 1500;
+      testMatch.game_score = 1;
       await expect(testMatch._calculateRatingChange(elo1, elo2)).toEqual(10);
     });
   });
