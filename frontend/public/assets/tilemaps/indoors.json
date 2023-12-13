@@ -503,7 +503,7 @@
                  "id":29,
                  "name":"Basement Lounge",
                  "rotation":0,
-                 "type":"ConversationArea",
+                 "type":"GameArea",
                  "visible":true,
                  "width":134.000333333333,
                  "x":2943.6665,

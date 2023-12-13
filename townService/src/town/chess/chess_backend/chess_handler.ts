@@ -175,12 +175,13 @@ export default class ChessHandler {
   static async winner(req, res) {
     const filler = req;
     let response;
-    if (game.winner === -1) {
+    if (game.winner === '-1') {
       response = { winner: null, winnerColor: null };
       res.json(response);
       return;
     }
     const winnerID = game.winner;
+    console.log(game.winner);
     const winnersColor = game.winner.white_id === winnerID ? Colors.White : Colors.Black;
     response = { winner: winnerID, winnerColor: winnersColor };
     res.json(response);

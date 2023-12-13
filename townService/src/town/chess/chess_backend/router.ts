@@ -4,6 +4,8 @@ import ChessGame from './chess_app';
 import ChessHandler from './chess_handler';
 import StockfishHandler from './stockfish_handler';
 
+import DatabaseHandler from '../database/database_handler';
+
 const router = Express.Router();
 // const chess = new ChessGame(1, 2);
 
@@ -26,5 +28,9 @@ router.route('/stockfishinit/:elo').post(StockfishHandler.initialize);
 router.route('/stockfishmove').post(StockfishHandler.getBestMove);
 router.route('/stockfishlist').post(StockfishHandler.getBestMoveList);
 router.route('/stockfishreal').post(StockfishHandler.getRealMove);
+
+router.route('/databaseinit').post(DatabaseHandler.initialize);
+router.route('/databaseleaderboard').get(DatabaseHandler.databaseGetAll);
+router.route('/updateElo').post(DatabaseHandler.databaseSetELO);
 
 export default router;
